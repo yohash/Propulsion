@@ -1,0 +1,21 @@
+{
+  "name": "com.yohash.propulsion",
+  "version": "0.1.0",
+  "displayName": "Propulsion Toolkit",
+  "description": "A collection of scripts to enable physics-based propulsion",
+  "unity": "2019.1",
+  "unityRelease": "0b5",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "keywords": [
+    "propulsion",
+    "physics"
+  ],
+  "author": {
+    "name": "Jason Heebl",
+    "email": "jdheebl@gmail.com",
+    "url": "https://www.heebl.com"
+  },
+  "type": "library"
+}
