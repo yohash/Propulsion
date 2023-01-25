@@ -43,16 +43,19 @@ namespace Yohash.Propulsion
       ErrorRateOfChange
     }
 
+    [Header("Assign these coefficients")]
     //PID coefficients
-    [SerializeField] private float proportionalGain;
-    [SerializeField] private float integralGain;
-    [SerializeField] private float derivativeGain;
+    [SerializeField] private float proportionalGain = 1;
+    [SerializeField] private float integralGain = 1;
+    [SerializeField] private float derivativeGain = 1;
 
     [SerializeField] private float outputMin = -1;
     [SerializeField] private float outputMax = 1;
-    [SerializeField] private float integralSaturation;
+    [Tooltip("Saturation is recommended equal to outputMax")]
+    [SerializeField] private float integralSaturation = 1;
     [SerializeField] private DerivativeMeasurement derivativeMeasurement;
 
+    [Header("Internal Variables")]
     [SerializeField] private float valueLast;
     [SerializeField] private float errorLast;
     [SerializeField] private float integrationStored;
