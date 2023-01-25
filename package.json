@@ -12,6 +12,13 @@
     "propulsion",
     "physics"
   ],
+  "samples": [
+    {
+      "displayName": "PID Example 3-axis",
+      "description": "A sample controller that uses 3 PID controllers to physically match a target's position",
+      "path": "Samples~/PidExample"
+    }
+  ],
   "author": {
     "name": "Jason Heebl",
     "email": "jdheebl@gmail.com",
