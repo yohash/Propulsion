@@ -123,8 +123,8 @@ namespace Yohash.Propulsion
     public float UpdateAngle(float dt, float currentAngle, float targetAngle)
     {
       if (dt <= 0) throw new ArgumentOutOfRangeException(nameof(dt));
-      float error = angleDifference(targetAngle, currentAngle);
-      errorLast = error;
+      float error = AngleDifference(targetAngle, currentAngle);
+      //errorLast = error;
 
       //calculate P term
       float P = proportionalGain * error;
@@ -134,10 +134,12 @@ namespace Yohash.Propulsion
       float I = integralGain * integrationStored;
 
       //calculate both D terms
-      float errorRateOfChange = angleDifference(error, errorLast) / dt;
+      var errorDiff = AngleDifference(error, errorLast);
+      float errorRateOfChange = errorDiff / dt;
       errorLast = error;
 
-      float valueRateOfChange = angleDifference(currentAngle, valueLast) / dt;
+      var valueDiff = AngleDifference(currentAngle, valueLast);
+      float valueRateOfChange = valueDiff / dt;
       valueLast = currentAngle;
       velocity = valueRateOfChange;
 
@@ -167,7 +169,7 @@ namespace Yohash.Propulsion
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    private float angleDifference(float a, float b)
+    public static float AngleDifference(float a, float b)
     {
       return (a - b + 540) % 360 - 180;
     }
