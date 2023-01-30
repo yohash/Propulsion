@@ -14,9 +14,14 @@
   ],
   "samples": [
     {
-      "displayName": "PID Example 3-axis",
+      "displayName": "PID Example 3-axis translation controller",
       "description": "A sample controller that uses 3 PID controllers to physically match a target's position",
       "path": "Samples~/PidExample"
+    },
+    {
+      "displayName": "PID Example 3-axis rotation controller",
+      "description": "A sample controller that uses 3 PID controllers to physically point at a target while maintaining an \"Up\" rotation",
+      "path": "Samples~/PidRotateExample"
     }
   ],
   "author": {
