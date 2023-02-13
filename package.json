@@ -1,6 +1,6 @@
 {
   "name": "com.yohash.propulsion",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "displayName": "Propulsion Toolkit",
   "description": "A collection of scripts to enable physics-based propulsion",
   "unity": "2019.1",
@@ -22,6 +22,11 @@
       "displayName": "PID Example 3-axis rotation controller",
       "description": "A sample controller that uses 3 PID controllers to physically point at a target while maintaining an \"Up\" rotation",
       "path": "Samples~/PidRotateExample"
+    },
+    {
+      "displayName": "Example physics-based vehicle controller",
+      "description": "This sample controller applies inputs to the vehicle motor to drive a car",
+      "path": "Samples~/GroundVehicle"
     }
   ],
   "author": {
