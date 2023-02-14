@@ -8,9 +8,9 @@ public class Controller : MonoBehaviour
 
   public Vector3 throttle;
 
-  public PIDController ControllerX;
-  public PIDController ControllerY;
-  public PIDController ControllerZ;
+  public PidController ControllerX;
+  public PidController ControllerY;
+  public PidController ControllerZ;
 
   private Rigidbody rb;
 
