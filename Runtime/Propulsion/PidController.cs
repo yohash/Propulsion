@@ -35,7 +35,7 @@ namespace Yohash.Propulsion
   /// </summary>
 
   [Serializable]
-  public class PIDController
+  public class PidController
   {
     public enum DerivativeMeasurement
     {
@@ -44,7 +44,7 @@ namespace Yohash.Propulsion
     }
 
     [Header("Assign these coefficients")]
-    //PID coefficients
+    // PID coefficients
     [SerializeField] private float proportionalGain = 1;
     [SerializeField] private float integralGain = 1;
     [SerializeField] private float derivativeGain = 1;

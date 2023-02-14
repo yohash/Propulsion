@@ -17,9 +17,9 @@ namespace Yohash.Propulsion
     public bool Z;
 
     [Header("Tune PID controllers on a per-axis basis")]
-    public PIDController controllerX;
-    public PIDController controllerY;
-    public PIDController controllerZ;
+    public PidController controllerX;
+    public PidController controllerY;
+    public PidController controllerZ;
 
     /// <summary>
     /// Returns a 3-axis Torque vector that can be applied to the to match
