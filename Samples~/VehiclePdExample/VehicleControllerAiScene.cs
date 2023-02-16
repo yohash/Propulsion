@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(VehicleMotor))]
-public class VehicleController : MonoBehaviour
+public class VehicleControllerAiScene : MonoBehaviour
 {
   [SerializeField] private VehicleMotor motor;
 

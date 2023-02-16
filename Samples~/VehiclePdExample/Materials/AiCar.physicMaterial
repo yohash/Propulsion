@@ -6,7 +6,7 @@ PhysicMaterial:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: car
+  m_Name: AiCar
   dynamicFriction: 0.1
   staticFriction: 0.5
   bounciness: 0

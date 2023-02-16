@@ -1,6 +1,6 @@
 {
   "name": "com.yohash.propulsion",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "displayName": "Propulsion Toolkit",
   "description": "A collection of scripts to enable physics-based propulsion",
   "unity": "2019.1",
@@ -27,6 +27,11 @@
       "displayName": "Example physics-based vehicle controller",
       "description": "This sample controller applies inputs to the vehicle motor to drive a car",
       "path": "Samples~/GroundVehicle"
+    },
+    {
+      "displayName": "Vehicle PD Controller AI",
+      "description": "This example uses the Vehicle PD controller as an AI which matches a user-controlled vehicle",
+      "path": "Samples~/VehiclePdExample"
     }
   ],
   "author": {

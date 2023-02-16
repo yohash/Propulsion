@@ -18,6 +18,14 @@ public class VehicleMotor : MonoBehaviour
   [SerializeField] private float forwardFrictionForce;
   [SerializeField] private float sidewaysFrictionForce;
 
+  [Header("Values determined by environment")]
+  [SerializeField] private int ground;
+  // with 2 wheels, we need the number of ground contacts
+  // to be 2+
+  private bool isGrounded {
+    get { return ground >= 2; }
+  }
+
   private void Awake()
   {
     rb = GetComponent<Rigidbody>();
@@ -26,6 +34,11 @@ public class VehicleMotor : MonoBehaviour
 
   private void FixedUpdate()
   {
+    // we need some sort of intelligent test to determine
+    // if we've enough "wheels on the ground" to apply
+    // driving forces
+    if (!isGrounded) { return; }
+
     // every physics step, we apply environmental forces
     var relativeForward = Vector3.Dot(rb.velocity, transform.forward) * transform.forward;
     var relativeSideways = Vector3.Dot(rb.velocity, transform.right) * transform.right;
@@ -69,6 +82,11 @@ public class VehicleMotor : MonoBehaviour
   /// <param name="torque"></param>
   public void ApplyForces(float acceleration, float torque)
   {
+    // we need some sort of intelligent test to determine
+    // if we've enough "wheels on the ground" to apply
+    // driving forces
+    if (!isGrounded) { return; }
+
     // compute acceleration force on the rigid body
     var accelerationForce = acceleration * enginePower * transform.forward;
 
@@ -78,5 +96,20 @@ public class VehicleMotor : MonoBehaviour
     // apply the forces
     rb.AddForce(accelerationForce);
     rb.AddRelativeTorque(relativeTorque);
+  }
+
+  // ***********************************************************
+  //			COLLISION HANDLING
+  // ***********************************************************
+  void OnCollisionEnter(Collision col)
+  {
+    // TODO - detect terrain, or viable "driving" surface
+    ground++;
+  }
+
+  void OnCollisionExit(Collision col)
+  {
+    // TODO - detect terrain, or viable "driving" surface
+    ground--;
   }
 }
