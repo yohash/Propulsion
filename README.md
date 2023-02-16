@@ -3,7 +3,7 @@ Scripts to enable vehicular propulsion, using physics-based systems
 
 ## Source Material
 
-This implementation here is cloned from [vazgriz](https://github.com/vazgriz), specifically, [PID_Controller](https://github.com/vazgriz/PID_Controller). 
+This implementation here is sourced from [vazgriz](https://github.com/vazgriz), specifically, [PID_Controller](https://github.com/vazgriz/PID_Controller). 
 
 It has been cloned to enable the Unity package manager (UPM) to access and update this extension. Other tools in other repositories will benefit from being able to declare UPM dependencies and auto-import the package.
 
