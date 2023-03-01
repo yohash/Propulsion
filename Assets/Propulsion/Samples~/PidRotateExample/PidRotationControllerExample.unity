@@ -392,21 +392,13 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 8143949534671404610, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
+      propertyPath: Power
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8143949534671404610, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
       propertyPath: AimAtTarget
       value: 
       objectReference: {fileID: 403421519}
-    - target: {fileID: 8143949534671404610, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
-      propertyPath: controller.X
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8143949534671404610, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
-      propertyPath: controller.Y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8143949534671404610, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
-      propertyPath: controller.Z
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8143949534671404635, guid: e890639d6252bcb43880b55f39b012d8, type: 3}
       propertyPath: m_Name
       value: Turret

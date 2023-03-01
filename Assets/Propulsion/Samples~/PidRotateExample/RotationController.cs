@@ -8,11 +8,20 @@ public class RotationController : MonoBehaviour
   public float Power = 10f;
 
   [Header("Output Throttle")]
-  public Vector3 Throttle;
+  public Vector3 Torque;
 
-  [Header("Tune controller rotational axes")]
-  public PidRotationController controller;
+  [Header("Per-axis PID rotation controller")]
+  public PidRotationController pidRoteController;
 
+  [Header("Stable backwards PD controller")]
+  public BackwardsPdController backwardsPdController;
+
+  public enum Controller
+  {
+    PidRotation,
+    BackwardsPd,
+  }
+  public Controller controller = Controller.BackwardsPd;
 
   // cached var
   private Rigidbody rb;
@@ -27,14 +36,28 @@ public class RotationController : MonoBehaviour
     if (AimAtTarget == null) { return; }
 
     var aimAtDirection = AimAtTarget.transform.position - transform.position;
+    var desiredRotation = Quaternion.LookRotation(aimAtDirection, Vector3.up);
 
-    Throttle = controller.Update(
-      Time.fixedDeltaTime,
-      new Pose(transform.position, transform.rotation),
-      aimAtDirection,
-      Vector3.up
-    );
+    switch (controller) {
+      case Controller.PidRotation:
+        Torque = pidRoteController.Update(
+          Time.fixedDeltaTime,
+          new Pose(transform.position, transform.rotation),
+          aimAtDirection,
+          Vector3.up
+        );
+        break;
 
-    rb.AddRelativeTorque(Throttle * Power);
+      case Controller.BackwardsPd:
+        Torque = backwardsPdController.BackwardTorque(
+          Time.fixedDeltaTime,
+          desiredRotation,
+          transform.rotation,
+          rb
+        );
+        break;
+    }
+
+    rb.AddTorque(Torque * Power);
   }
 }
