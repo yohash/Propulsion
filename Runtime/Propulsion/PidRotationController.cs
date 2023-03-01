@@ -6,8 +6,15 @@ namespace Yohash.Propulsion
   /// <summary>
   /// The PID rotation controller manages 3 individual PidController instances,
   /// one for each rotation axis.
-  /// </summary>
   ///
+  /// This controller attempts to take desired lookAt direction and localUp vectors,
+  /// and project desired facings individually onto 3 separate axes. The output is a
+  /// Vector3 of the axis-by-axis torque required to meet a given facing and up vector.
+  ///
+  /// This approach uses the PID angle-specific controller for each individual axis,
+  /// and may not necessarily be stable for all orientations. It is best for simple
+  /// rotations where you can guarantee an Up-vector that faces up
+  /// </summary>
   [Serializable]
   public class PidRotationController
   {
@@ -27,6 +34,10 @@ namespace Yohash.Propulsion
     ///   - current Transform (as Pose)
     ///   - desired "look at" vector
     ///   - desired "up" vector
+    ///
+    /// Make sure the output Torque vector is applied in a relative manner, that is, using:
+    ///     rigidbody.AddRelativeTorque(T)
+    /// and not relative to the body (ie. rigidbody.AddTorque(T))
     /// </summary>
     /// <param name="dt"></param>
     /// <param name="currentPose"></param>

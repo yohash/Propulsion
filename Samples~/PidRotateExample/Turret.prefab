@@ -52,8 +52,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AimAtTarget: {fileID: 0}
   Power: 50
-  Throttle: {x: 0, y: 0, z: 0}
-  controller:
+  Torque: {x: 0, y: 0, z: 0}
+  pidRoteController:
     X: 1
     Y: 1
     Z: 1
@@ -96,6 +96,10 @@ MonoBehaviour:
       integrationStored: 0
       velocity: 0
       derivativeInitialized: 0
+  backwardsPdController:
+    damping: 1
+    frequency: 4
+  controller: 1
 --- !u!33 &8143949534671404638
 MeshFilter:
   m_ObjectHideFlags: 0
