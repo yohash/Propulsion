@@ -28,27 +28,23 @@ namespace Yohash.Propulsion
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
-      Rigidbody rigidbody
+      Vector3 currentVelocity
     )
     {
       // majority of cases the desired velocity is v = (0,0,0), as the controller is needed
       // to calculate forces necessary to move to a given position and stop there, in a stable
       // manner
-      return Update(dt, currentPosition, desiredPosition, rigidbody, Vector3.zero);
+      return Update(dt, currentPosition, desiredPosition, currentVelocity, Vector3.zero);
     }
 
     /// <summary>
     /// The backwards PD controller for position and velocity matching
-    ///
-    /// ** untested **
-    ///
-    ///
     /// </summary>
     public Vector3 Update(
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
-      Rigidbody rigidbody,
+      Vector3 currentVelocity,
       Vector3 desiredVelocity
     )
     {
@@ -59,10 +55,9 @@ namespace Yohash.Propulsion
       float kpg = kp * g;
       float kdg = (kd + kp * dt) * g;
 
-      Vector3 vdes = desiredVelocity;
       Vector3 pt0 = currentPosition;
-      Vector3 vt0 = rigidbody.velocity;
-      Vector3 F = (desiredPosition - pt0) * kpg + (vdes - vt0) * kdg;
+      Vector3 vt0 = currentVelocity;
+      Vector3 F = (desiredPosition - pt0) * kpg + (desiredVelocity - vt0) * kdg;
 
       return F;
     }
@@ -84,7 +79,6 @@ namespace Yohash.Propulsion
       var kp = (6f * frequency) * (6f * frequency) * 0.25f;
       var kd = 4.5f * frequency * damping;
 
-      //
       float g = 1 / (1 + kd * dt + kp * dt * dt);
       float kpg = kp * g;
       float kdg = (kd + kp * dt) * g;
