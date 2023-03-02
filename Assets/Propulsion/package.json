@@ -19,9 +19,9 @@
       "path": "Samples~/PidExample"
     },
     {
-      "displayName": "PID Example 3-axis rotation controller",
-      "description": "A sample controller that uses 3 PID controllers to physically point at a target while maintaining an \"Up\" rotation",
-      "path": "Samples~/PidRotateExample"
+      "displayName": "Example rotation controller",
+      "description": "A sample controller that uses a stable backward PD controller to physically rotate a turret to point at a target while maintaining an \"Up\" rotation",
+      "path": "Samples~/RotationControllerExample"
     },
     {
       "displayName": "Example physics-based vehicle controller",
