@@ -9,5 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Danish translation from [@frederikspang](https://github.com/frederikspang).
 - Backwards PD Controller for quaternion based rotation control from [digitalopus.ca/site/pd-controllers/](http://digitalopus.ca/site/pd-controllers/)
