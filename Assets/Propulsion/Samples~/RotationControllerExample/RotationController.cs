@@ -49,11 +49,13 @@ public class RotationController : MonoBehaviour
         break;
 
       case Controller.BackwardsPd:
-        Torque = backwardsPdController.BackwardTorque(
+        Torque = backwardsPdController.UpdateRotation(
           Time.fixedDeltaTime,
           desiredRotation,
           transform.rotation,
-          rb
+          rb.angularVelocity,
+          rb.inertiaTensorRotation,
+          rb.inertiaTensor
         );
         break;
     }
