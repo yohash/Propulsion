@@ -24,7 +24,7 @@ namespace Yohash.Propulsion
     // i.e.a frequency of 6 will bring you very close to your target within 1/6 seconds.
     [SerializeField] private float frequency = 4;
 
-    public Vector3 Update(
+    public Vector3 UpdatePosition(
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
@@ -34,13 +34,13 @@ namespace Yohash.Propulsion
       // majority of cases the desired velocity is v = (0,0,0), as the controller is needed
       // to calculate forces necessary to move to a given position and stop there, in a stable
       // manner
-      return Update(dt, currentPosition, desiredPosition, currentVelocity, Vector3.zero);
+      return UpdatePosition(dt, currentPosition, desiredPosition, currentVelocity, Vector3.zero);
     }
 
     /// <summary>
     /// The backwards PD controller for position and velocity matching
     /// </summary>
-    public Vector3 Update(
+    public Vector3 UpdatePosition(
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
@@ -73,8 +73,21 @@ namespace Yohash.Propulsion
     /// Make sure the output Torque vector is applied in an absolute manner, that is, using:
     ///     rigidbody.AddTorque(T)
     /// and not relative to the body (ie. rigidbody.AddRelativeTorque(T))
+    ///
+    /// The inputs for
+    ///   - Angular Velocity
+    ///   - Inertia Tensor Rotation
+    ///   - Inertia Tensor
+    /// Can typically be extracted directly from a RigidBody or an ArticulationBody
     /// </summary>
-    public Vector3 BackwardTorque(float dt, Quaternion desiredRotation, Quaternion currentRotation, Rigidbody rigidbody)
+    public Vector3 UpdateRotation(
+      float dt,
+      Quaternion desiredRotation,
+      Quaternion currentRotation,
+      Vector3 angularVelocity,
+      Quaternion inertiaTensorRotation,
+      Vector3 inertiaTensor
+    )
     {
       var kp = (6f * frequency) * (6f * frequency) * 0.25f;
       var kd = 4.5f * frequency * damping;
@@ -100,12 +113,12 @@ namespace Yohash.Propulsion
       x.Normalize();
       x *= Mathf.Deg2Rad;
 
-      //var pidv = kp * x * xMag - kd * rigidbody.angularVelocity;
-      var pidv = kpg * x * xMag - kdg * rigidbody.angularVelocity;
-      var rotInertia2World = rigidbody.inertiaTensorRotation * currentRotation;
+      //var pidv = kp * x * xMag - kd * angularVelocity;
+      var pidv = kpg * x * xMag - kdg * angularVelocity;
+      var rotInertia2World = inertiaTensorRotation * currentRotation;
 
       pidv = Quaternion.Inverse(rotInertia2World) * pidv;
-      pidv.Scale(rigidbody.inertiaTensor);
+      pidv.Scale(inertiaTensor);
       pidv = rotInertia2World * pidv;
 
       return pidv;
