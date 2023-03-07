@@ -8,9 +8,14 @@ public class Controller : MonoBehaviour
 
   public Vector3 throttle;
 
-  public PidController ControllerX;
-  public PidController ControllerY;
-  public PidController ControllerZ;
+  public PidController PidControllerX;
+  public PidController PidControllerY;
+  public PidController PidControllerZ;
+
+  public BackwardsPdController PdController;
+
+  public enum CONTROLLER { Pid3Axis, BackwardsPd}
+  public CONTROLLER Drive;
 
   private Rigidbody rb;
 
@@ -23,11 +28,23 @@ public class Controller : MonoBehaviour
   {
     if (Target == null) { return; }
 
-    throttle = new Vector3(
-      ControllerX.Update(Time.fixedDeltaTime, rb.position.x, Target.position.x),
-      ControllerY.Update(Time.fixedDeltaTime, rb.position.y, Target.position.y),
-      ControllerZ.Update(Time.fixedDeltaTime, rb.position.z, Target.position.z)
-    );
+    switch (Drive) {
+      case CONTROLLER.Pid3Axis:
+        throttle = new Vector3(
+          PidControllerX.Update(Time.fixedDeltaTime, rb.position.x, Target.position.x),
+          PidControllerY.Update(Time.fixedDeltaTime, rb.position.y, Target.position.y),
+          PidControllerZ.Update(Time.fixedDeltaTime, rb.position.z, Target.position.z)
+        );
+        break;
+      case CONTROLLER.BackwardsPd:
+        throttle = PdController.UpdatePosition(
+          Time.fixedDeltaTime,
+          transform.position,
+          Target.transform.position,
+          rb.velocity
+        );
+        break;
+    }
 
     rb.AddForce(throttle * Power);
   }
