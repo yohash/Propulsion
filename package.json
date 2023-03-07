@@ -1,6 +1,6 @@
 {
   "name": "com.yohash.propulsion",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "displayName": "Propulsion Toolkit",
   "description": "A collection of scripts to enable physics-based propulsion",
   "unity": "2019.1",
@@ -15,7 +15,7 @@
   "samples": [
     {
       "displayName": "PID Example 3-axis translation controller",
-      "description": "A sample controller that uses 3 PID controllers to physically match a target's position",
+      "description": "A sample controller that compares 3 PID controllers to a backwards PD controller to physically match a target's position",
       "path": "Samples~/PidExample"
     },
     {
