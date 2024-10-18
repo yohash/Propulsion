@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace Yohash.Propulsion.Samples.GroundVehicle
+namespace Yohash.Propulsion.Samples.VehiclePdFollower
 {
   [RequireComponent(typeof(VehicleMotor))]
-  public class VehicleController : MonoBehaviour
+  public class VehicleControllerAiScene : MonoBehaviour
   {
     [SerializeField] private VehicleMotor motor;
 

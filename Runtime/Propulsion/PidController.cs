@@ -73,20 +73,21 @@ namespace Yohash.Propulsion
     /// <param name="dt"></param>
     /// <param name="currentValue"></param>
     /// <param name="targetValue"></param>
-    public float Update(float dt, float currentValue, float targetValue)
+    public float ComputeForce1D(float dt, float currentValue, float targetValue)
     {
-      if (dt <= 0) throw new ArgumentOutOfRangeException(nameof(dt));
+      if (dt <= 0)
+        throw new ArgumentOutOfRangeException(nameof(dt));
 
       float error = targetValue - currentValue;
 
-      //calculate P term
+      // calculate P term
       float P = proportionalGain * error;
 
-      //calculate I term
+      // calculate I term
       integrationStored = Mathf.Clamp(integrationStored + (error * dt), -integralSaturation, integralSaturation);
       float I = integralGain * integrationStored;
 
-      //calculate both D terms
+      // calculate both D terms
       float errorRateOfChange = (error - errorLast) / dt;
       errorLast = error;
 
@@ -94,7 +95,7 @@ namespace Yohash.Propulsion
       valueLast = currentValue;
       velocity = valueRateOfChange;
 
-      //choose D term to use
+      // choose D term to use
       float deriveMeasure = 0;
 
       if (derivativeInitialized) {
@@ -120,20 +121,21 @@ namespace Yohash.Propulsion
     /// <param name="dt"></param>
     /// <param name="currentAngle"></param>
     /// <param name="targetAngle"></param>
-    public float UpdateAngle(float dt, float currentAngle, float targetAngle)
+    public float ComputeTorque1D(float dt, float currentAngle, float targetAngle)
     {
-      if (dt <= 0) throw new ArgumentOutOfRangeException(nameof(dt));
+      if (dt <= 0)
+        throw new ArgumentOutOfRangeException(nameof(dt));
       float error = AngleDifference(targetAngle, currentAngle);
       //errorLast = error;
 
-      //calculate P term
+      // calculate P term
       float P = proportionalGain * error;
 
-      //calculate I term
+      // calculate I term
       integrationStored = Mathf.Clamp(integrationStored + (error * dt), -integralSaturation, integralSaturation);
       float I = integralGain * integrationStored;
 
-      //calculate both D terms
+      // calculate both D terms
       var errorDiff = AngleDifference(error, errorLast);
       float errorRateOfChange = errorDiff / dt;
       errorLast = error;
