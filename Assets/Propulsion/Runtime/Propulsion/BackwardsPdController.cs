@@ -4,11 +4,10 @@ using UnityEngine;
 namespace Yohash.Propulsion
 {
   /// <summary>
-  /// The stable torque PD controller is a backwards PD controller that
-  /// is unconditionally stable. This torque controller computes the
-  /// force needed to reach the desired input in the next time step.
-  ///
-  /// Sourced from http://digitalopus.ca/site/pd-controllers/
+  /// *******************************************************************
+  /// This code was adapted from http://digitalopus.ca/site/pd-controllers/
+  /// *******************************************************************
+  /// The backwards PD controller is unconditionally stable. 
   /// </summary>
   [Serializable]
   public class BackwardsPdController
@@ -24,7 +23,14 @@ namespace Yohash.Propulsion
     // i.e.a frequency of 6 will bring you very close to your target within 1/6 seconds.
     [SerializeField] private float frequency = 4;
 
-    public Vector3 UpdatePosition(
+    // TBD: Is this legit? Or did I just copy it blindly from PidController?
+    // it does not appear in the source material
+    // TODO - test this in integral-needed situations (maintaining y-position against the 
+    // constant force of gravity)
+    [SerializeField] private Vector3 integrationStored;
+    [SerializeField] private float integralSaturation = 1;
+
+    public Vector3 ComputeForce(
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
@@ -34,13 +40,13 @@ namespace Yohash.Propulsion
       // majority of cases the desired velocity is v = (0,0,0), as the controller is needed
       // to calculate forces necessary to move to a given position and stop there, in a stable
       // manner
-      return UpdatePosition(dt, currentPosition, desiredPosition, currentVelocity, Vector3.zero);
+      return ComputeForce(dt, currentPosition, desiredPosition, currentVelocity, Vector3.zero);
     }
 
     /// <summary>
     /// The backwards PD controller for position and velocity matching
     /// </summary>
-    public Vector3 UpdatePosition(
+    public Vector3 ComputeForce(
       float dt,
       Vector3 currentPosition,
       Vector3 desiredPosition,
@@ -55,11 +61,18 @@ namespace Yohash.Propulsion
       float kpg = kp * g;
       float kdg = (kd + kp * dt) * g;
 
-      Vector3 pt0 = currentPosition;
-      Vector3 vt0 = currentVelocity;
-      Vector3 F = (desiredPosition - pt0) * kpg + (desiredVelocity - vt0) * kdg;
+      var pt0 = currentPosition;
+      var vt0 = currentVelocity;
+      var F = (desiredPosition - pt0) * kpg + (desiredVelocity - vt0) * kdg;
 
-      return F;
+      // TBD: Is this legit? Or did I just copy it blindly from PidController?
+      // it does not appear in the source material
+      // TODO - test this in integral-needed situations (maintaining y-position against the 
+      // constant force of gravity)
+      // calculate I term
+      integrationStored = Vector3.ClampMagnitude(integrationStored + ((desiredPosition - pt0) * dt), integralSaturation);
+
+      return F + integrationStored;
     }
 
     /// <summary>
@@ -80,11 +93,11 @@ namespace Yohash.Propulsion
     ///   - Inertia Tensor
     /// Can typically be extracted directly from a RigidBody or an ArticulationBody
     /// </summary>
-    public Vector3 UpdateRotation(
+    public Vector3 ComputeTorque(
       float dt,
       Quaternion desiredRotation,
       Quaternion currentRotation,
-      Vector3 angularVelocity,
+      Vector3 currentAngularVelocity,
       Quaternion inertiaTensorRotation,
       Vector3 inertiaTensor
     )
@@ -114,7 +127,7 @@ namespace Yohash.Propulsion
       x *= Mathf.Deg2Rad;
 
       //var pidv = kp * x * xMag - kd * angularVelocity;
-      var pidv = kpg * x * xMag - kdg * angularVelocity;
+      var pidv = kpg * x * xMag - kdg * currentAngularVelocity;
       var rotInertia2World = inertiaTensorRotation * currentRotation;
 
       pidv = Quaternion.Inverse(rotInertia2World) * pidv;

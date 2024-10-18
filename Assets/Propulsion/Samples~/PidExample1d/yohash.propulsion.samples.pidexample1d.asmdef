@@ -1,0 +1,16 @@
+{
+	"name": "yohash.propulsion.samples.pidexample1d",
+    "rootNamespace": "",
+    "references": [
+        "yohash.propulsion.runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
