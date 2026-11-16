@@ -14,6 +14,7 @@ namespace Yohash.Propulsion.Samples.PidExample3d
     public Vector3 TargetVelocity;
 
     private Rigidbody rb;
+    private bool initialized;
 
     private void Awake()
     {
@@ -24,17 +25,19 @@ namespace Yohash.Propulsion.Samples.PidExample3d
     {
       if (Target == null) { return; }
 
-      TargetLastPosition = TargetPosition;
+      // on the first step there is no history, so assume the target is stationary
+      TargetLastPosition = initialized ? TargetPosition : Target.position;
       TargetPosition = Target.position;
       TargetVelocity = (TargetPosition - TargetLastPosition) / Time.fixedDeltaTime;
+      initialized = true;
 
       Force = StableController.ComputeForce(
         Time.fixedDeltaTime,
-        transform.position,
+        rb.mass,
+        rb.position,
         rb.velocity,
-        Target.transform.position,
-        TargetVelocity,
-        rb.mass
+        TargetPosition,
+        TargetVelocity
       );
 
       rb.AddForce(Force);

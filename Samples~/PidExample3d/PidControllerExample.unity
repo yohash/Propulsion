@@ -398,7 +398,7 @@ MonoBehaviour:
   Throttle: {x: 0, y: 0, z: 0}
   StableController:
     damping: 1
-    frequency: 4
+    frequency: 2
   TargetPosition: {x: 0, y: 0, z: 0}
   TargetLastPosition: {x: 0, y: 0, z: 0}
   TargetVelocity: {x: 0, y: 0, z: 0}
@@ -876,7 +876,7 @@ MonoBehaviour:
   Force: {x: 0, y: 0, z: 0}
   PdController:
     damping: 1
-    frequency: 4
+    frequency: 2
     integrationStored: {x: 0, y: 0, z: 0}
     integralSaturation: 1
 --- !u!1 &1374582472

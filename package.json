@@ -1,6 +1,6 @@
 {
   "name": "com.yohash.propulsion",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "displayName": "Propulsion Toolkit",
   "description": "A collection of scripts to enable physics-based propulsion",
   "unity": "2019.1",
@@ -15,12 +15,12 @@
   "samples": [
     {
       "displayName": "PID Example 1-axis translation controller",
-      "description": "A sample controller that compares PID controller, a backwards PD controller, and a stable PD controller along 1 axis to physically match a target's position",
+      "description": "A sample controller that compares a PID controller, and a stable PD controller with and without target-velocity tracking, along 1 axis to physically match a target's position",
       "path": "Samples~/PidExample1d"
     },
     {
       "displayName": "PID Example 3-axis translation controller",
-      "description": "A sample controller that compares a 3-axis PID controller, a backwards PD controller, and a stable PD controller to physically match a target's position",
+      "description": "A sample controller that compares a 3-axis PID controller, and a stable PD controller with and without target-velocity tracking, to physically match a target's position",
       "path": "Samples~/PidExample3d"
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "displayName": "Example 3d rotation controller",
-      "description": "A sample controller that uses a stable backward PD controller to physically rotate a turret to point at a target while maintaining an \"Up\" rotation",
+      "description": "A sample controller that uses the stable PD controller, with and without target angular-velocity tracking, to physically rotate a turret to point at a target while maintaining an \"Up\" rotation",
       "path": "Samples~/RotationController3d"
     },
     {
