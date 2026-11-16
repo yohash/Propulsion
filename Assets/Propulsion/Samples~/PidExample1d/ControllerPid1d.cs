@@ -21,7 +21,7 @@ namespace Yohash.Propulsion.Samples.PidExample1d
     {
       if (Target == null) { return; }
 
-      Throttle = PidControllerX.ComputeForce1D(Time.fixedDeltaTime, rb.position.x, Target.position.x);
+      Throttle = PidControllerX.Compute(Time.fixedDeltaTime, rb.position.x, Target.position.x);
 
       rb.AddForce(new Vector2(Throttle, 0) * Power);
     }

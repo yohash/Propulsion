@@ -16,7 +16,7 @@ public class VehiclePdController
   [SerializeField] private float derivativeGain = 1;
 
   [Header("Turning controller")]
-  [SerializeField] private StablePdController2D turnsController;
+  [SerializeField] private StablePdController turnsController;
 
   [SerializeField] private float currentAngle;
   [SerializeField] private float lastAngle;

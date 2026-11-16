@@ -54,7 +54,7 @@ MonoBehaviour:
   Torque: {x: 0, y: 0, z: 0}
   backwardsPdController:
     damping: 1
-    frequency: 4
+    frequency: 2
     integrationStored: {x: 0, y: 0, z: 0}
     integralSaturation: 1
 --- !u!33 &8143949534671404638

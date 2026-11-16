@@ -901,7 +901,7 @@ MonoBehaviour:
   Torque: 0
   stablePdController:
     damping: 1
-    frequency: 4
+    frequency: 2
 --- !u!1 &1929269333
 GameObject:
   m_ObjectHideFlags: 0

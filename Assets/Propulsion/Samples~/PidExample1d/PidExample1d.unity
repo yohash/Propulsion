@@ -345,7 +345,7 @@ MonoBehaviour:
   Force: 0
   PdController:
     damping: 1
-    frequency: 4
+    frequency: 2
     integrationStored: {x: 0, y: 0, z: 0}
     integralSaturation: 1
 --- !u!1 &1674403315
@@ -467,7 +467,7 @@ MonoBehaviour:
   Force: 0
   XStableController:
     damping: 1
-    frequency: 4
+    frequency: 2
   TargetPosition: 0
   TargetLastPosition: 0
   TargetVelocity: 0

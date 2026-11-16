@@ -15,10 +15,11 @@ namespace Yohash.Propulsion.Samples.Rotation2d
     public float Torque;
 
     [Header("Stable PD controller")]
-    public StablePdController2D stablePdController;
+    public StablePdController stablePdController;
 
     // cached var
     private Rigidbody2D rb;
+    private bool initialized;
 
     private void Awake()
     {
@@ -29,21 +30,23 @@ namespace Yohash.Propulsion.Samples.Rotation2d
     {
       if (AimAtTarget == null) { return; }
 
-      LastToTarget = CurrentToTargetAngle;
-
-      CurrentAngle = transform.rotation.eulerAngles.z;
-      var toTarget = (Vector2)(AimAtTarget.position - transform.position);
+      CurrentAngle = rb.rotation;
+      var toTarget = (Vector2)AimAtTarget.position - rb.position;
+      // on the first step there is no history, so assume the target is stationary
+      LastToTarget = initialized ? CurrentToTargetAngle : Vector2.SignedAngle(Vector2.up, toTarget);
       CurrentToTargetAngle = Vector2.SignedAngle(Vector2.up, toTarget);
+      initialized = true;
 
-      TargetAngularVelocity = (CurrentToTargetAngle - LastToTarget) / Time.fixedDeltaTime;
+      // wrap-safe: crossing +/-180 degrees does not produce a velocity spike
+      TargetAngularVelocity = Mathf.DeltaAngle(LastToTarget, CurrentToTargetAngle) / Time.fixedDeltaTime;
 
       Torque = stablePdController.ComputeTorque(
         Time.fixedDeltaTime,
+        rb.inertia,
         CurrentAngle * Mathf.Deg2Rad,
         rb.angularVelocity * Mathf.Deg2Rad,
         CurrentToTargetAngle * Mathf.Deg2Rad,
-        TargetAngularVelocity * Mathf.Deg2Rad,
-        rb.inertia
+        TargetAngularVelocity * Mathf.Deg2Rad
       );
 
       rb.AddTorque(Torque);
