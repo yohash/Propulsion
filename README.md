@@ -1,6 +1,8 @@
 # Propulsion
 Scripts to enable vehicular propulsion, using physics-based systems.
 
+The Unity package lives in [`Assets/Propulsion`](Assets/Propulsion). See its [README](Assets/Propulsion/README.md) for usage, and the [CHANGELOG](Assets/Propulsion/CHANGELOG.md) for release notes and migration guides.
+
 ## Source Material
 
 The implementation of the PID Controller is sourced from [vazgriz](https://github.com/vazgriz), specifically, [PID_Controller](https://github.com/vazgriz/PID_Controller). 
@@ -15,16 +17,23 @@ The Stable PD Controller is based on [Stable Proportional-Derivative Controllers
 | `PidController` | A bounded, normalized throttle with an integral term, for actuators with limited strength or unknown persistent disturbances. Hand tuned. |
 | `PropulsionMath` | Shared helpers: angle wrapping, quaternion to rotation vector, angular velocity from successive rotations, angular acceleration to torque. |
 
-## Unity Package Manager support /#upm
+## Installation (Unity Package Manager)
 
-Add to your project via the Unity Package Manager. 
-1. In the Package Manger, select "Add package from Git URL..."
-2. Type in 
+Requires Unity 2022.3 or newer.
+
+1. In the Package Manager, select **+ > Add package from git URL...**
+2. Enter:
 ```
 https://github.com/yohash/Propulsion.git#upm
 ```
 
-The `upm` branch is maintained us a current subtree via:
+## Releasing
+
+The `upm` branch holds only the package folder, maintained as a subtree split of `Assets/Propulsion`. After merging a release into `main`:
+
+1. Set the release date on its `CHANGELOG.md` entry (replacing `Unreleased`) and commit.
+2. Update the `upm` branch and push it:
 ```
 git subtree split --prefix=Assets/Propulsion --branch upm
+git push origin upm
 ```
