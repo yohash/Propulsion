@@ -17,6 +17,10 @@ The Stable PD Controller is based on [Stable Proportional-Derivative Controllers
 | `PidController` | A bounded, normalized throttle with an integral term, for actuators with limited strength or unknown persistent disturbances. Hand tuned. |
 | `PropulsionMath` | Shared helpers: angle wrapping, quaternion to rotation vector, angular velocity from successive rotations, angular acceleration to torque. |
 
+## Reference material
+
+Papers and other background material live in [`Documentation/`](Documentation). They are kept out of the Unity package itself.
+
 ## Installation (Unity Package Manager)
 
 Requires Unity 2022.3 or newer.
