@@ -2,46 +2,60 @@
   "name": "com.yohash.propulsion",
   "version": "0.6.0",
   "displayName": "Propulsion Toolkit",
-  "description": "A collection of scripts to enable physics-based propulsion",
-  "unity": "2019.1",
-  "unityRelease": "0b5",
-  "documentationUrl": "https://example.com/",
+  "description": "Physics-based controllers for Rigidbody propulsion. StablePdController matches a target position or rotation (1 or 3 axes) with a physically parameterized response (frequency in Hz, damping ratio) that is unconditionally stable at any timestep. PidController provides a bounded throttle with an integral term. Includes a vehicle motor and AI follower, with comparison samples.",
+  "unity": "2022.3",
+  "documentationUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/README.md",
   "changelogUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/CHANGELOG.md",
-  "licensesUrl": "https://example.com/licensing.html",
+  "licensesUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/LICENSE.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yohash/Propulsion.git"
+  },
+  "dependencies": {
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0"
+  },
   "keywords": [
     "propulsion",
-    "physics"
+    "physics",
+    "rigidbody",
+    "controller",
+    "pid",
+    "pd",
+    "stable-pd",
+    "vehicle"
   ],
   "samples": [
     {
-      "displayName": "PID Example 1-axis translation controller",
-      "description": "A sample controller that compares a PID controller, and a stable PD controller with and without target-velocity tracking, along 1 axis to physically match a target's position",
+      "displayName": "1-axis translation: PID vs Stable PD",
+      "description": "Compares a PID controller with the Stable PD controller, with and without target-velocity tracking, moving a Rigidbody2D along one axis to match a target's position.",
       "path": "Samples~/PidExample1d"
     },
     {
-      "displayName": "PID Example 3-axis translation controller",
-      "description": "A sample controller that compares a 3-axis PID controller, and a stable PD controller with and without target-velocity tracking, to physically match a target's position",
+      "displayName": "3-axis translation: PID vs Stable PD",
+      "description": "Compares a 3-axis PID controller with the Stable PD controller, with and without target-velocity tracking, moving a Rigidbody under gravity to match a target's position.",
       "path": "Samples~/PidExample3d"
     },
     {
-      "displayName": "Example 2d rotation controller",
-      "description": "A sample controller that compares a PID controller and a Stable PD controller to physically rotate a turret to point at a target",
+      "displayName": "2D rotation: PID vs Stable PD",
+      "description": "Compares a PID controller with the Stable PD controller, physically rotating a Rigidbody2D turret to point at a target.",
       "path": "Samples~/RotationController2d"
     },
     {
-      "displayName": "Example 3d rotation controller",
-      "description": "A sample controller that uses the stable PD controller, with and without target angular-velocity tracking, to physically rotate a turret to point at a target while maintaining an \"Up\" rotation",
+      "displayName": "3D rotation: Stable PD",
+      "description": "Uses the Stable PD controller, with and without target angular-velocity tracking, to physically rotate a turret to point at a target while keeping it upright.",
       "path": "Samples~/RotationController3d"
     },
     {
-      "displayName": "Example physics-based vehicle controller",
-      "description": "This sample controller applies inputs to the vehicle motor to drive a car",
+      "displayName": "Ground vehicle",
+      "description": "Drives a physics-based car with the keyboard (WASD) through the VehicleMotor.",
       "path": "Samples~/GroundVehicle"
     },
     {
-      "displayName": "Vehicle PD Controller AI",
-      "description": "This example uses the Vehicle PD controller as an AI which matches a user-controlled vehicle",
-      "path": "Samples~/VehiclePdExample"
+      "displayName": "Vehicle AI follower",
+      "description": "Uses the VehiclePdController as an AI that matches the trajectory of a user-controlled (WASD) vehicle.",
+      "path": "Samples~/VehiclePdFollower"
     }
   ],
   "author": {

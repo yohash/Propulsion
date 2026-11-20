@@ -5,10 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.0] - 2026-11-16
+## [0.6.0] - Unreleased
 
 This release converges the PD controllers into a single, physically exact controller.
-It contains breaking API changes.
+It contains breaking API changes: see **Migrating from 0.5** below.
+
+### Migrating from 0.5
+
+| 0.5 | 0.6 |
+|---|---|
+| `BackwardsPdController` | `StablePdController` |
+| `StablePdController2D` | `StablePdController` (the single-axis overloads) |
+| `backwardsPd.ComputeForce(dt, position, targetPosition, velocity)` | `stablePd.ComputeAcceleration(dt, position, velocity, targetPosition, Vector3.zero)`, or `ComputeForce(dt, mass, ...)` with the same arguments, applied with `AddForce` |
+| `backwardsPd.ComputeTorque(dt, targetRotation, rotation, angularVelocity, inertiaTensorRotation, inertiaTensor)` | `stablePd.ComputeTorque(dt, inertiaTensorRotation, inertiaTensor, rotation, angularVelocity, targetRotation, Vector3.zero)` |
+| `stablePd.ComputeForce(dt, p, v, pTarget, vTarget, mass)` | `stablePd.ComputeForce(dt, mass, p, v, pTarget, vTarget)` |
+| `stablePd.ComputeTorque(dt, r, w, rTarget, wTarget, inertiaTensorRotation, inertiaTensor)` | `stablePd.ComputeTorque(dt, inertiaTensorRotation, inertiaTensor, r, w, rTarget, wTarget)` |
+| `stablePd2D.ComputeForce1D(dt, p, v, pTarget, vTarget, mass)` | `stablePd.ComputeForce(dt, mass, p, v, pTarget, vTarget)` |
+| `stablePd2D.ComputeTorque(dt, angle, w, targetAngle, wTarget, inertia)` | `stablePd.ComputeTorque(dt, inertia, angle, w, targetAngle, wTarget)` |
+| `pid.ComputeForce1D(dt, current, target)` | `pid.Compute(dt, current, target)` |
+| `pid.ComputeTorque1D(dt, currentAngle, targetAngle)` | `pid.ComputeAngle(dt, currentAngle, targetAngle)` |
+| `PidController.AngleDifference(a, b)` | `Mathf.DeltaAngle(b, a)` |
+
+- **Retune `frequency`.** It is now in Hz: divide old values by about 2 for a similar stiffness (old 4 is about new 2). `damping = 1` is now truly critically damped (in 0.5 its effective damping ratio was about 0.75).
+- **`BackwardsPdController.ComputeForce` returned an acceleration** despite its name. If you applied it with `AddForce` on a body whose mass isn't 1, switch to `ComputeForce(dt, mass, ...)`; the response will then no longer depend on the mass.
+- **The `BackwardsPdController` integral term is gone.** To hold position against gravity, pass `-Physics.gravity` as the feedforward acceleration.
 
 ### Changed
 
@@ -20,6 +40,8 @@ It contains breaking API changes.
 - `PidController.ComputeForce1D` is renamed `Compute` and `ComputeTorque1D` is renamed `ComputeAngle`, since both return a throttle rather than a force or torque
 - `PidController` `integralSaturation` now limits the integral term's contribution to the output (previously it limited the raw integral, so it only matched `outputMax` when `integralGain` = 1). The integral also no longer winds up while the output is saturated
 - `PidController.ComputeAngle` uses wrap-safe angle differences for the error and both derivative terms, for any input angle range
+- The package now requires Unity 2022.3 (previously declared as 2019.1), and declares its dependencies on the Physics and Physics 2D modules
+- Sample display names now state what each sample compares
 - Sample scripts read state from the Rigidbody rather than the Transform, no longer produce a target-velocity spike on their first physics step, and the 2D / 3D rotation samples compute the target angular velocity correctly (wrap-safe in 2D; in rad/s about the correct axis in 3D)
 
 ### Added
@@ -28,12 +50,14 @@ It contains breaking API changes.
 - `StablePdController.GetDiscreteGains(dt, ...)` exposes the gains actually applied at a timestep
 - `StablePdController` and `PidController` constructors, and `Frequency` / `Damping` properties
 - EditMode tests for the controllers, which drive them with Unity's integrator to verify stability, convergence, tracking, wrap handling and inertia handling
+- Package documentation (`README.md`), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
 
 ### Fixed
 
 - `PidController.Reset` now clears the stored integral and derivative history, not only the derivative initialization flag
 - 3D torque conversion now composes the inertia frame as `rotation * inertiaTensorRotation`. The removed `BackwardsPdController` used the reverse order, which gave wrong torques for bodies whose principal axes are not aligned with the body
 - Quaternion error no longer relies on `Quaternion.ToAngleAxis`, which can return NaN for slightly non-unit quaternions
+- The "Vehicle AI follower" sample can now be imported: `package.json` pointed at `Samples~/VehiclePdExample` instead of `Samples~/VehiclePdFollower`
 
 ### Removed
 
