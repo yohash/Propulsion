@@ -72,4 +72,4 @@ SOFTWARE.
 
 > J. Tan, K. Liu, G. Turk. *Stable Proportional-Derivative Controllers*. http://www.jie-tan.net/project/spd.pdf
 
-No code from the paper is included. A copy of the paper is bundled at `Runtime/Propulsion/Stable Proportional-Derivative Controllers.pdf` for reference; its copyright belongs to its authors and publisher.
+No code or text from the paper is included in this package. A reference copy is kept in the source repository, under `Documentation/`, outside the package; its copyright belongs to its authors and publisher.

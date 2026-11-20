@@ -64,6 +64,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `BackwardsPdController`: its control law (with a target velocity) is algebraically identical to the implicit stable PD, now `StablePdController`. Its unscaled integral term has been removed; use the feedforward acceleration for known forces such as gravity, or `PidController` for unknown ones
 - `StablePdController2D`: its single-axis methods are now overloads on `StablePdController`
 - `PidController.AngleDifference`: use `Mathf.DeltaAngle`
+- The bundled *Stable Proportional-Derivative Controllers* paper PDF no longer ships in the package. It moved to the repository's `Documentation/` folder, and the package docs link to the paper instead
 
 ## [0.5.0] - 2024-10-18
 
