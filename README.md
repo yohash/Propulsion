@@ -33,11 +33,19 @@ https://github.com/yohash/Propulsion.git#upm
 
 ## Releasing
 
-The `upm` branch holds only the package folder, maintained as a subtree split of `Assets/Propulsion`. After merging a release into `main`:
+The `upm` branch holds only the package folder, as a subtree split of `Assets/Propulsion`. Publishing is automated by the [Publish UPM workflow](.github/workflows/publish-upm.yml). Whenever `main` has a `package.json` version that has no `vX.Y.Z` tag yet, it updates `upm` and tags it, provided the version's `CHANGELOG.md` entry is dated.
 
-1. Set the release date on its `CHANGELOG.md` entry (replacing `Unreleased`) and commit.
-2. Update the `upm` branch and push it:
+To release:
+
+1. Bump `version` in `Assets/Propulsion/package.json`, and add a `## [X.Y.Z] - Unreleased` entry to `CHANGELOG.md`.
+2. Before or after merging to `main`, replace `Unreleased` with the release date (`YYYY-MM-DD`). The workflow publishes as soon as `main` has a dated entry. Until then it skips with a warning.
+
+A specific release can then be installed with `https://github.com/yohash/Propulsion.git#vX.Y.Z`.
+
+To publish by hand instead (e.g. if the workflow is unavailable), run on an up-to-date `main`:
 ```
 git subtree split --prefix=Assets/Propulsion --branch upm
 git push origin upm
+git tag -a vX.Y.Z upm -m "Propulsion Toolkit X.Y.Z"
+git push origin vX.Y.Z
 ```
