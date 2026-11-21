@@ -50,7 +50,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `StablePdController.GetDiscreteGains(dt, ...)` exposes the gains actually applied at a timestep
 - `StablePdController` and `PidController` constructors, and `Frequency` / `Damping` properties
 - EditMode tests for the controllers, which drive them with Unity's integrator to verify stability, convergence, tracking, wrap handling and inertia handling
-- Package documentation (`README.md`), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
+- Package documentation (`README.md`, including the samples' input-handling and render-pipeline requirements), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
 
 ### Fixed
 
