@@ -50,6 +50,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `StablePdController.GetDiscreteGains(dt, ...)` exposes the gains actually applied at a timestep
 - `StablePdController` and `PidController` constructors, and `Frequency` / `Damping` properties
 - A `VehiclePdController` constructor, `VehiclePdController.Reset()` (which forgets the heading history after a teleport or re-target), and the `arriveRadius` / `arriveSpeed` settings
+- `VehicleMotor.MaxYawAcceleration`, `VehicleMotor.YawAccelerationToInput()` and `VehicleMotor.YawAccelerationPerUnitTorque()`, for converting a yaw acceleration into the motor's turn input
 - EditMode tests for the controllers, which drive them with Unity's integrator to verify stability, convergence, tracking, wrap handling and inertia handling
 - Package documentation (`README.md`, including the samples' render-pipeline requirement), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
 
@@ -60,6 +61,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - Quaternion error no longer relies on `Quaternion.ToAngleAxis`, which can return NaN for slightly non-unit quaternions
 - The 3D rotation sample's `StableTurret` now runs `StablePdRotationController`. Its prefab was wired to the same script as `BackwardsTurret`, so the target angular-velocity tracking never ran and the two turrets behaved identically
 - `VehiclePdController` no longer feeds its turn controller spiking angular velocities. Headings are now differenced wrap-safe (`Mathf.DeltaAngle`), so crossing ±180° is a small step rather than a 360° jump (previously up to 18,000°/s at 50 Hz). The first update starts from rest, instead of differencing against 0°. And once the vehicle sits on its target, within an arrival dead-zone (`arriveRadius`, default 5 cm, and `arriveSpeed`, default 0.1 m/s), it holds the heading it arrived with. Previously, contact jitter of a few millimetres set the target facing in a random direction, and a parked vehicle spun in place
+- The vehicle AI's steering is now proportional. `VehiclePdController`'s steer is a desired yaw acceleration (rad/s²), and `VehicleAi` used to clamp it to ±1 directly, so about 0.5° of heading error saturated it and steering was bang-bang. `VehicleAi` now converts it with `VehicleMotor.YawAccelerationToInput`, from `turningPower` and the Rigidbody's inertia, so the steering only saturates at the car's real turning limit, and the turn controller's frequency and damping take effect. Throttle is unchanged
 - The two vehicle samples now work with any Active Input Handling setting. They read the keyboard through the Input System package when it's active (the default in new Unity 6 projects), instead of throwing `InvalidOperationException` every frame, and fall back to the legacy Input Manager otherwise. The Input System reference is guarded by a `versionDefines` entry in each sample's assembly definition, so the package still doesn't depend on it
 - The "Vehicle AI follower" sample can now be imported: `package.json` pointed at `Samples~/VehiclePdExample` instead of `Samples~/VehiclePdFollower`
 
