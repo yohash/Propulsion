@@ -32,7 +32,7 @@ namespace Yohash.Propulsion.Samples.Rotation2d
       var toTarget = (Vector2)(AimAtTarget.position - transform.position);
       ToTargetAngle = Vector2.SignedAngle(Vector2.up, toTarget);
 
-      Torque = Pid.ComputeTorque1D(Time.fixedDeltaTime, CurrentAngle, ToTargetAngle);
+      Torque = Pid.ComputeAngle(Time.fixedDeltaTime, CurrentAngle, ToTargetAngle);
       rb.AddTorque(Torque * Power);
     }
   }

@@ -9,7 +9,7 @@ public struct Trajectory
   public Trajectory(Rigidbody rb)
   {
     Position = rb.position;
-    Velocity = rb.velocity;
+    Velocity = rb.linearVelocity;
   }
 
   public override string ToString()

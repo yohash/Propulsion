@@ -8,7 +8,8 @@ namespace Yohash.Propulsion.Samples.PidExample3d
 
     public Vector3 Force;
 
-    public BackwardsPdController PdController;
+    // This controller is fed no target velocity, to contrast with ControllerStablePd which tracks it
+    public StablePdController PdController;
 
     private Rigidbody rb;
 
@@ -23,9 +24,11 @@ namespace Yohash.Propulsion.Samples.PidExample3d
 
       Force = PdController.ComputeForce(
         Time.fixedDeltaTime,
-        transform.position,
-        Target.transform.position,
-        rb.velocity
+        rb.mass,
+        rb.position,
+        rb.linearVelocity,
+        Target.position,
+        Vector3.zero
       );
 
       rb.AddForce(Force);

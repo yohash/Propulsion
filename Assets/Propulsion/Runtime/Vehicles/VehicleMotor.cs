@@ -40,8 +40,8 @@ public class VehicleMotor : MonoBehaviour
     if (!isGrounded) { return; }
 
     // every physics step, we apply environmental forces
-    var relativeForward = Vector3.Dot(rb.velocity, transform.forward) * transform.forward;
-    var relativeSideways = Vector3.Dot(rb.velocity, transform.right) * transform.right;
+    var relativeForward = Vector3.Dot(rb.linearVelocity, transform.forward) * transform.forward;
+    var relativeSideways = Vector3.Dot(rb.linearVelocity, transform.right) * transform.right;
 
     var dragForward = -relativeForward * forwardFrictionForce;
     var dragSideways = -relativeSideways * sidewaysFrictionForce;

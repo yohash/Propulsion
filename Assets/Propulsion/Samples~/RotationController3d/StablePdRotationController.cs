@@ -8,15 +8,15 @@ namespace Yohash.Propulsion.Samples.Rotation3d
     public Transform AimAtTarget;
 
     public Vector3 Torque;
-    public Vector3 CurrentAimAt;
-    public Vector3 LastAimAt;
     public Vector3 TargetAngularVelocity;
 
-    [Header("Backwards PD controller")]
+    [Header("Stable PD controller")]
     public StablePdController stablePdController;
 
     // cached var
     private Rigidbody rb;
+    private Quaternion lastTargetRotation;
+    private bool initialized;
 
     private void Awake()
     {
@@ -27,20 +27,27 @@ namespace Yohash.Propulsion.Samples.Rotation3d
     {
       if (AimAtTarget == null) { return; }
 
-      LastAimAt = CurrentAimAt;
-      CurrentAimAt = AimAtTarget.transform.position - transform.position;
-      TargetAngularVelocity = (CurrentAimAt - LastAimAt) / Time.fixedDeltaTime;
+      var aimAtDirection = AimAtTarget.position - rb.position;
+      var targetRotation = Quaternion.LookRotation(aimAtDirection, Vector3.up);
 
-      var targetRotation = Quaternion.LookRotation(CurrentAimAt, Vector3.up);
+      // the target's angular velocity, from successive target rotations (rad/s, world space).
+      // On the first step there is no history, so assume the target is stationary.
+      if (!initialized) { lastTargetRotation = targetRotation; initialized = true; }
+      TargetAngularVelocity = PropulsionMath.AngularVelocity(
+        lastTargetRotation,
+        targetRotation,
+        Time.fixedDeltaTime
+      );
+      lastTargetRotation = targetRotation;
 
       Torque = stablePdController.ComputeTorque(
         Time.fixedDeltaTime,
-        transform.rotation,
+        rb.inertiaTensorRotation,
+        rb.inertiaTensor,
+        rb.rotation,
         rb.angularVelocity,
         targetRotation,
-        TargetAngularVelocity,
-        rb.inertiaTensorRotation,
-        rb.inertiaTensor
+        TargetAngularVelocity
       );
 
       rb.AddTorque(Torque);
