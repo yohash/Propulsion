@@ -57,6 +57,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `PidController.Reset` now clears the stored integral and derivative history, not only the derivative initialization flag
 - 3D torque conversion now composes the inertia frame as `rotation * inertiaTensorRotation`. The removed `BackwardsPdController` used the reverse order, which gave wrong torques for bodies whose principal axes are not aligned with the body
 - Quaternion error no longer relies on `Quaternion.ToAngleAxis`, which can return NaN for slightly non-unit quaternions
+- The 3D rotation sample's `StableTurret` now runs `StablePdRotationController`. Its prefab was wired to the same script as `BackwardsTurret`, so the target angular-velocity tracking never ran and the two turrets behaved identically
 - The "Vehicle AI follower" sample can now be imported: `package.json` pointed at `Samples~/VehiclePdExample` instead of `Samples~/VehiclePdFollower`
 
 ### Removed

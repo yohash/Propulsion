@@ -46,12 +46,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8143949534671404635}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff9b13107bf9efc49bdd26d66c576e2c, type: 3}
+  m_Script: {fileID: 11500000, guid: e75c8fa529ed068469d87755dafebbb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   AimAtTarget: {fileID: 0}
   Torque: {x: 0, y: 0, z: 0}
-  backwardsPdController:
+  TargetAngularVelocity: {x: 0, y: 0, z: 0}
+  stablePdController:
     frequency: 2
     damping: 1
 --- !u!33 &8143949534671404638

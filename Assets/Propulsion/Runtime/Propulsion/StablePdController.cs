@@ -62,6 +62,9 @@ namespace Yohash.Propulsion
   /// So `frequency` is the true undamped natural frequency in Hz, and `damping` is the true
   /// damping ratio: 1 = critically damped, < 1 under damped (overshoots), > 1 over damped.
   /// With damping = 1, the error falls to ~5% after about 0.75 / frequency seconds.
+  /// (That describes a step to a stationary target. A tracked target that moves fast and
+  /// then stops abruptly is overshot, since the stop is a deceleration the controller was
+  /// not given; pass it as feedforward if that matters.)
   ///
   /// A physics step cannot represent an oscillation faster than a few steps per cycle, so for
   /// damping < 1 the damped oscillation frequency is capped at a quarter cycle per step

@@ -85,6 +85,7 @@ rb.AddTorque(torque);  // world space: not AddRelativeTorque
 
 - **Frequency (Hz)** is the true natural frequency. With damping = 1, the error falls to about 5% after `0.75 / frequency` seconds (about 0.4 s at 2 Hz).
 - **Damping** is the true damping ratio: `1` is critically damped (fastest without overshoot), below `1` overshoots, above `1` is sluggish. `0` oscillates forever.
+- **These figures describe a step to a stationary target.** When you pass a target velocity, the controller follows it. So if the target moves quickly and then stops abruptly (a fast drag or a teleport), the body arrives carrying that velocity and overshoots, by about 17% at the sample defaults. That is correct tracking: the sudden stop is a deceleration the controller was never told about. If it matters, pass the target's acceleration as feedforward, or smooth a finite-difference target velocity before passing it in.
 - **Any value is stable.** As frequency rises, the response tends towards reaching the target in a single physics step. For under-damped settings, the oscillation is capped at a quarter cycle per physics step (12.5 Hz at 50 Hz physics).
 - **When the mass, inertia or forces are uncertain**, keep frequency below about `1 / (2π · fixedDeltaTime)` (8 Hz at 50 Hz physics). The stability guarantee assumes the mass and inertia you pass in are correct, and the tolerance shrinks as frequency rises. The class documentation has the figures.
 
