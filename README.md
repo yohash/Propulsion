@@ -23,7 +23,7 @@ Papers and other background material live in [`Documentation/`](Documentation). 
 
 ## Installation (Unity Package Manager)
 
-Requires Unity 2022.3 or newer.
+Requires Unity 6 (6000.3) or newer.
 
 1. In the Package Manager, select **+ > Add package from git URL...**
 2. Enter:

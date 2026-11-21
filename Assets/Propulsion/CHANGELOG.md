@@ -40,7 +40,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `PidController.ComputeForce1D` is renamed `Compute` and `ComputeTorque1D` is renamed `ComputeAngle`, since both return a throttle rather than a force or torque
 - `PidController` `integralSaturation` now limits the integral term's contribution to the output (previously it limited the raw integral, so it only matched `outputMax` when `integralGain` = 1). The integral also no longer winds up while the output is saturated
 - `PidController.ComputeAngle` uses wrap-safe angle differences for the error and both derivative terms, for any input angle range
-- The package now requires Unity 2022.3 (previously declared as 2019.1), and declares its dependencies on the Physics and Physics 2D modules
+- The package now requires Unity 6 (6000.3; previously declared as 2019.1), and declares its dependencies on the Physics and Physics 2D modules
 - Sample display names now state what each sample compares
 - Sample scripts read state from the Rigidbody rather than the Transform, no longer produce a target-velocity spike on their first physics step, and the 2D / 3D rotation samples compute the target angular velocity correctly (wrap-safe in 2D; in rad/s about the correct axis in 3D)
 

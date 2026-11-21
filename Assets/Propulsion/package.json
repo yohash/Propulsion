@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "displayName": "Propulsion Toolkit",
   "description": "Physics-based controllers for Rigidbody propulsion. StablePdController matches a target position or rotation (1 or 3 axes) with a physically parameterized response (frequency in Hz, damping ratio) that is unconditionally stable at any timestep. PidController provides a bounded throttle with an integral term. Includes a vehicle motor and AI follower, with comparison samples.",
-  "unity": "2022.3",
+  "unity": "6000.3",
   "documentationUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/README.md",
   "changelogUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/CHANGELOG.md",
   "licensesUrl": "https://github.com/yohash/Propulsion/blob/main/Assets/Propulsion/LICENSE.md",
