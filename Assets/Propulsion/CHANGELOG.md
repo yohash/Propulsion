@@ -50,7 +50,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `StablePdController.GetDiscreteGains(dt, ...)` exposes the gains actually applied at a timestep
 - `StablePdController` and `PidController` constructors, and `Frequency` / `Damping` properties
 - EditMode tests for the controllers, which drive them with Unity's integrator to verify stability, convergence, tracking, wrap handling and inertia handling
-- Package documentation (`README.md`, including the samples' input-handling and render-pipeline requirements), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
+- Package documentation (`README.md`, including the samples' render-pipeline requirement), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
 
 ### Fixed
 
@@ -58,6 +58,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - 3D torque conversion now composes the inertia frame as `rotation * inertiaTensorRotation`. The removed `BackwardsPdController` used the reverse order, which gave wrong torques for bodies whose principal axes are not aligned with the body
 - Quaternion error no longer relies on `Quaternion.ToAngleAxis`, which can return NaN for slightly non-unit quaternions
 - The 3D rotation sample's `StableTurret` now runs `StablePdRotationController`. Its prefab was wired to the same script as `BackwardsTurret`, so the target angular-velocity tracking never ran and the two turrets behaved identically
+- The two vehicle samples now work with any Active Input Handling setting. They read the keyboard through the Input System package when it's active (the default in new Unity 6 projects), instead of throwing `InvalidOperationException` every frame, and fall back to the legacy Input Manager otherwise. The Input System reference is guarded by a `versionDefines` entry in each sample's assembly definition, so the package still doesn't depend on it
 - The "Vehicle AI follower" sample can now be imported: `package.json` pointed at `Samples~/VehiclePdExample` instead of `Samples~/VehiclePdFollower`
 
 ### Removed
