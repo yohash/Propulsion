@@ -69,8 +69,12 @@ public class VehiclePdController
   /// belongs to the object whose position/velocity we are attempting to match.
   /// Tweak the P and D parameters to optimize trajectory matching.
   ///
-  /// The return Tuple is in the format (Acceleration, Steer), where a (+)
-  /// steering value indicates turning to the right
+  /// The return Tuple is in the format (Acceleration, Steer):
+  ///   - Acceleration: a throttle-like input along the vehicle's forward axis.
+  ///   - Steer: the desired yaw angular acceleration, in rad/s^2, where (+) turns right.
+  ///     It is a physical quantity, not a normalized input: convert it with
+  ///     VehicleMotor.YawAccelerationToInput before clamping it to +/-1. Clamping it directly
+  ///     saturates at a fraction of a degree of heading error, making the steering bang-bang.
   /// </summary>
   /// <param name="pose"></param>
   /// <param name="target"></param>

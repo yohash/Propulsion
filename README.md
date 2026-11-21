@@ -7,7 +7,7 @@ Physics-based controllers for moving and rotating Rigidbodies with forces and to
 | `StablePdController` | Matching a target position / velocity, or rotation / angular velocity, in 1 or 3 axes. Parameterized physically (frequency in Hz, damping ratio), scaled by mass or inertia, and unconditionally stable at any timestep. Known forces such as gravity are cancelled exactly through its feedforward term. |
 | `PidController` | A bounded, normalized throttle with an integral term: for actuators with limited strength, or unknown persistent disturbances. Hand tuned. |
 | `PropulsionMath` | Helpers: angle wrapping, quaternion to rotation vector, angular velocity from successive rotations, angular acceleration to torque. |
-| `VehicleMotor`, `VehiclePdController` | A simple physics car and an AI driver that follows another body's trajectory. |
+| `VehicleMotor`, `VehiclePdController` | A simple physics car, and an AI driver that follows another body's trajectory. The driver's steer is a desired yaw acceleration (rad/s²): convert it to the motor's turn input with `VehicleMotor.YawAccelerationToInput`, which accounts for `turningPower` and the Rigidbody's inertia, before clamping. |
 
 Requires Unity 6 (6000.3) or newer. Everything lives in the `Yohash.Propulsion` namespace, except the vehicle types, which are in the global namespace.
 

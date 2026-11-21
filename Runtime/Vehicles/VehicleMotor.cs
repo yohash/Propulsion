@@ -73,6 +73,48 @@ public class VehicleMotor : MonoBehaviour
   }
 
   /// <summary>
+  /// The yaw angular acceleration (rad/s^2, about the vehicle's local up axis) that a full
+  /// turn input of 1 produces: turningPower divided by the Rigidbody's effective moment of
+  /// inertia about that axis. Ground friction and damping, which this ignores, make the real
+  /// value somewhat lower; feedback controllers correct for the difference.
+  /// </summary>
+  public float MaxYawAcceleration {
+    get {
+      if (rb == null) { rb = GetComponent<Rigidbody>(); }
+      return turningPower * YawAccelerationPerUnitTorque(rb.inertiaTensorRotation, rb.inertiaTensor);
+    }
+  }
+
+  /// <summary>
+  /// Converts a desired yaw angular acceleration (rad/s^2, positive turns right) into the turn
+  /// input for ApplyForces. The result is unclamped: values beyond +/-1 ask for more than the
+  /// motor can deliver, so clamp before applying.
+  /// </summary>
+  public float YawAccelerationToInput(float yawAcceleration)
+  {
+    float max = MaxYawAcceleration;
+    return max > 0f ? yawAcceleration / max : 0f;
+  }
+
+  /// <summary>
+  /// The angular acceleration about the body's local up axis per unit of torque applied about
+  /// that axis (1 / kg m^2), from a Rigidbody's principal moments of inertia:
+  ///
+  ///     sum over principal axes i of  p_i^2 / I_i,    p = up, in the principal-axis frame
+  ///
+  /// With the principal axes aligned to the body, this is simply 1 / inertiaTensor.y.
+  /// </summary>
+  public static float YawAccelerationPerUnitTorque(Quaternion inertiaTensorRotation, Vector3 inertiaTensor)
+  {
+    var p = Quaternion.Inverse(inertiaTensorRotation) * Vector3.up;
+    float k = 0f;
+    if (inertiaTensor.x > 0f) { k += p.x * p.x / inertiaTensor.x; }
+    if (inertiaTensor.y > 0f) { k += p.y * p.y / inertiaTensor.y; }
+    if (inertiaTensor.z > 0f) { k += p.z * p.z / inertiaTensor.z; }
+    return k;
+  }
+
+  /// <summary>
   /// Two inputs are acceleration and turning. Both can be positive or
   /// negative values. This method should be called during FixedUpdate().
   ///

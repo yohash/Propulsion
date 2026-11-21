@@ -15,6 +15,8 @@ namespace Yohash.Propulsion.Samples.VehiclePdFollower
     [SerializeField] private VehiclePdController controller;
 
     public float accel;
+    // the controller's desired yaw angular acceleration (rad/s^2), and the turn input it maps to
+    public float yawAcceleration;
     public float steer;
 
     private void Awake()
@@ -33,15 +35,17 @@ namespace Yohash.Propulsion.Samples.VehiclePdFollower
         }
       }
 
-      (accel, steer) = controller.Update(
+      (accel, yawAcceleration) = controller.Update(
         Time.fixedDeltaTime,
         new Pose(transform.position, transform.rotation),
         new Trajectory(target),
         new Trajectory(rb)
       );
 
+      // the controller asks for a yaw acceleration; the motor knows how much one unit of turn
+      // input delivers, so steering stays proportional until the car's turning limit
       accel = Mathf.Clamp(accel, -1, 1);
-      steer = Mathf.Clamp(steer, -1, 1);
+      steer = Mathf.Clamp(motor.YawAccelerationToInput(yawAcceleration), -1, 1);
 
       motor.ApplyForces(accel, steer);
     }
