@@ -35,7 +35,7 @@ namespace Yohash.Propulsion.Samples.PidExample3d
         Time.fixedDeltaTime,
         rb.mass,
         rb.position,
-        rb.velocity,
+        rb.linearVelocity,
         TargetPosition,
         TargetVelocity
       );

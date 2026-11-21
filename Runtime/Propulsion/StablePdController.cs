@@ -85,9 +85,9 @@ namespace Yohash.Propulsion
   ///  - Gravity, drag and contacts are disturbances the controller does not know about. Cancel
   ///    gravity exactly by passing it in the feedforward term:
   ///        feedforwardAcceleration = targetAcceleration - Physics.gravity
-  ///    Drag (rigidbody.drag / angularDrag) leaves a small tracking lag on moving targets.
+  ///    Drag (rigidbody.linearDamping / angularDamping) leaves a small tracking lag on moving targets.
   ///  - Rigidbody.maxAngularVelocity defaults to 7 rad/s, and it silently limits fast rotation.
-  ///  - Read state from the Rigidbody (rb.position, rb.rotation, rb.velocity,
+  ///  - Read state from the Rigidbody (rb.position, rb.rotation, rb.linearVelocity,
   ///    rb.angularVelocity) rather than the Transform, which may be interpolated.
   /// </summary>
   [Serializable]

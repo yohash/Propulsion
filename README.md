@@ -9,7 +9,7 @@ Physics-based controllers for moving and rotating Rigidbodies with forces and to
 | `PropulsionMath` | Helpers: angle wrapping, quaternion to rotation vector, angular velocity from successive rotations, angular acceleration to torque. |
 | `VehicleMotor`, `VehiclePdController` | A simple physics car and an AI driver that follows another body's trajectory. |
 
-Requires Unity 2022.3 or newer. Everything lives in the `Yohash.Propulsion` namespace, except the vehicle types, which are in the global namespace.
+Requires Unity 6 (6000.3) or newer. Everything lives in the `Yohash.Propulsion` namespace, except the vehicle types, which are in the global namespace.
 
 ## Installation
 
@@ -56,7 +56,7 @@ public class Follow : MonoBehaviour
 
     var force = Controller.ComputeForce(
       dt, rb.mass,
-      rb.position, rb.velocity,
+      rb.position, rb.linearVelocity,
       Target.position, targetVelocity,
       feedforward);
 
@@ -93,7 +93,7 @@ rb.AddTorque(torque);  // world space: not AddRelativeTorque
 - Methods named `…Acceleration` return accelerations: apply them with `ForceMode.Acceleration`, or use the `…Force` / `…Torque` variants, which scale by mass or inertia, with the default `ForceMode.Force`.
 - Angles are in **radians** and angular velocities in **rad/s**. `Rigidbody2D` reports `rotation` and `angularVelocity` in degrees: multiply by `Mathf.Deg2Rad`.
 - 3D angular quantities are world space, as `Rigidbody.angularVelocity` reports them.
-- Read state from the Rigidbody (`rb.position`, `rb.rotation`, `rb.velocity`, `rb.angularVelocity`) rather than the Transform, which may be interpolated.
+- Read state from the Rigidbody (`rb.position`, `rb.rotation`, `rb.linearVelocity`, `rb.angularVelocity`) rather than the Transform, which may be interpolated.
 
 ### Feedforward
 
