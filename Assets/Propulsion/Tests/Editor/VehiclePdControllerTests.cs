@@ -97,6 +97,63 @@ namespace Yohash.Propulsion.Tests
     }
 
     [Test]
+    public void SittingOnTheTargetWithContactJitterDoesNotSpin()
+    {
+      // In play, a vehicle parked on its target never has an exactly-zero error: contact jitter
+      // leaves a few millimetres in a random direction. Close the loop with a simple yaw model,
+      // where the clamped steer drives the yaw rate as VehicleAi and VehicleMotor do, and check
+      // that the heading holds.
+      var c = NewController();
+      var random = new System.Random(1234);
+      // deg/s^2 per unit of (clamped) steer. Stiff enough that the old exact-zero guard spins
+      // through ~280 degrees in these 6 s, close to the ~330 deg/s spin seen in the editor.
+      const float yawAcceleration = 500f;
+      float yaw = 131f;
+      float yawRate = 0f;
+
+      // arrive from an approach whose facing differs from the heading (as after a teleport)
+      Steer(c, yaw, Toward(40f, 10f));
+
+      float minYaw = yaw, maxYaw = yaw;
+      for (int i = 0; i < 300; i++) {
+        var jitter = new Vector3(
+          (float)(random.NextDouble() * 2 - 1) * 0.002f,
+          0f,
+          (float)(random.NextDouble() * 2 - 1) * 0.002f);
+        var target = new Trajectory {
+          Position = jitter,
+          Velocity = new Vector3((float)(random.NextDouble() * 2 - 1) * 0.01f, 0f, 0f),
+        };
+        float steer = c.Update(Dt, Heading(yaw), target, At(Vector3.zero)).Item2;
+
+        yawRate += Mathf.Clamp(steer, -1f, 1f) * yawAcceleration * Dt;
+        yaw += yawRate * Dt;
+        minYaw = Mathf.Min(minYaw, yaw);
+        maxYaw = Mathf.Max(maxYaw, yaw);
+      }
+
+      // the heading latched on arrival holds; without the dead-zone it wanders through 360
+      Assert.Less(maxYaw - minYaw, 1f, "the parked vehicle turned");
+    }
+
+    [Test]
+    public void LeavingTheArrivalHoldDoesNotSpike()
+    {
+      // park on the target, holding a heading of 90 degrees...
+      var c = NewController();
+      for (int i = 0; i < 5; i++) {
+        Steer(c, 90f, Vector3.zero);
+      }
+
+      // ...then the target moves off to 30 degrees. The facing jumps from the held 90 to 30;
+      // that is a new target, not a rotation, so the first steer must match a steady one.
+      var target = Toward(30f, 10f);
+      float leaving = Steer(c, 90f, target);
+      float steady = Steer(c, 90f, target);
+      Assert.AreEqual(steady, leaving, 1e-3);
+    }
+
+    [Test]
     public void ZeroFacingOnTheFirstUpdateUsesTheHeading()
     {
       var c = NewController();

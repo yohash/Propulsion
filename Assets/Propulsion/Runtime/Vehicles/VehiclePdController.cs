@@ -18,6 +18,13 @@ public class VehiclePdController
   [Header("Turning controller")]
   [SerializeField] private StablePdController turnsController;
 
+  [Header("Arrival")]
+  [Tooltip("Within this distance of the target (m, on the ground plane), and below Arrive Speed, " +
+    "the vehicle has arrived: it holds its heading instead of steering towards the target.")]
+  [SerializeField, Min(0f)] private float arriveRadius = 0.05f;
+  [Tooltip("The relative speed (m/s, on the ground plane) below which the vehicle can count as arrived.")]
+  [SerializeField, Min(0f)] private float arriveSpeed = 0.1f;
+
   [SerializeField] private float currentAngle;
   [SerializeField] private float lastAngle;
 
@@ -30,6 +37,9 @@ public class VehiclePdController
   // false until the first Update, so the first angular velocities are 0 rather than a jump
   // from 0 degrees. Not serialized, so a prefab or scene can never ship it already set.
   [System.NonSerialized] private bool initialized;
+
+  // true while the vehicle sits on its target and holds its heading
+  [System.NonSerialized] private bool arrived;
 
   // below this squared length a direction vector has no meaningful heading
   private const float MinDirectionSqrMagnitude = 1e-8f;
@@ -50,6 +60,7 @@ public class VehiclePdController
   public void Reset()
   {
     initialized = false;
+    arrived = false;
   }
 
   /// <summary>
@@ -104,12 +115,25 @@ public class VehiclePdController
     var facing = Vector3.Lerp(positionError, desiredAccel, desiredAccel.sqrMagnitude);
     var flatFacing = Vector3.ProjectOnPlane(facing, Vector3.up);
 
-    // Once the vehicle sits on its target with matching velocity, the facing vector is zero,
-    // and SignedAngle of a zero vector returns 0 (world forward). Hold the previous target
-    // facing instead (or the current heading, on the first update) rather than snapping.
-    float targetFacing = flatFacing.sqrMagnitude > MinDirectionSqrMagnitude
-      ? Vector3.SignedAngle(Vector3.forward, flatFacing, Vector3.up)
-      : (initialized ? currentTargetFacing : heading);
+    // Arrival: once the vehicle sits on its target with matching velocity, the facing vector
+    // is only contact jitter (millimetres, in a random direction), and steering towards it
+    // spins the vehicle in place. Inside the arrival dead-zone, hold the heading the vehicle
+    // had on arriving. Latching the heading, rather than the last facing, also means a
+    // teleport onto the target doesn't trigger a turn towards where it used to be.
+    var flatPositionError = Vector3.ProjectOnPlane(positionError, Vector3.up);
+    var flatVelocityError = Vector3.ProjectOnPlane(velocityError, Vector3.up);
+    bool wasArrived = arrived && initialized;
+    arrived = flatPositionError.magnitude < arriveRadius && flatVelocityError.magnitude < arriveSpeed;
+
+    float targetFacing;
+    if (arrived) {
+      targetFacing = wasArrived ? currentTargetFacing : heading;
+    } else if (flatFacing.sqrMagnitude > MinDirectionSqrMagnitude) {
+      targetFacing = Vector3.SignedAngle(Vector3.forward, flatFacing, Vector3.up);
+    } else {
+      // a zero facing vector outside the dead-zone: SignedAngle would return world forward
+      targetFacing = initialized ? currentTargetFacing : heading;
+    }
 
     // On the first update there is no history: start from rest instead of differencing
     // against the 0 degree initial values.
@@ -128,6 +152,12 @@ public class VehiclePdController
     // step rather than a 360 degree jump (which would be 18,000 deg/s at 50 Hz).
     angularVelocity = Mathf.DeltaAngle(lastAngle, currentAngle) / dt;
     targetAngularVelocity = Mathf.DeltaAngle(lastTargetFacing, currentTargetFacing) / dt;
+
+    // A held facing is stationary. Entering or leaving the hold makes the target facing jump,
+    // and that jump is a change of target, not a rotation: it must not register as a rate.
+    if (arrived || wasArrived) {
+      targetAngularVelocity = 0f;
+    }
 
     var steer = turnsController.ComputeAngularAcceleration(
        dt,
