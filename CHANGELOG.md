@@ -50,7 +50,7 @@ It contains breaking API changes: see **Migrating from 0.5** below.
 - `StablePdController.GetDiscreteGains(dt, ...)` exposes the gains actually applied at a timestep
 - `StablePdController` and `PidController` constructors, and `Frequency` / `Damping` properties
 - A `VehiclePdController` constructor, `VehiclePdController.Reset()` (which forgets the heading history after a teleport or re-target), and the `arriveRadius` / `arriveSpeed` settings
-- `VehicleMotor.MaxYawAcceleration`, `VehicleMotor.YawAccelerationToInput()` and `VehicleMotor.YawAccelerationPerUnitTorque()`, for converting a yaw acceleration into the motor's turn input
+- `VehicleMotor.MaxYawAcceleration`, `VehicleMotor.YawAccelerationToInput()` (instance, and a static overload taking the maximum), `VehicleMotor.YawAccelerationPerUnitTorque()` and `VehicleMotor.TurningPower`, for converting a yaw acceleration into the motor's turn input. `MaxYawAcceleration` is a free-body upper bound: ground friction delivers less (about 0.36 of it in the follower sample), which makes the turn response somewhat underdamped
 - EditMode tests for the controllers, which drive them with Unity's integrator to verify stability, convergence, tracking, wrap handling and inertia handling
 - Package documentation (`README.md`, including the samples' render-pipeline requirement), third-party license notices, and real documentation and license URLs in `package.json` (previously placeholders)
 

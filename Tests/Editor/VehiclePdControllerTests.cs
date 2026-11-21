@@ -100,14 +100,13 @@ namespace Yohash.Propulsion.Tests
     public void SittingOnTheTargetWithContactJitterDoesNotSpin()
     {
       // In play, a vehicle parked on its target never has an exactly-zero error: contact jitter
-      // leaves a few millimetres in a random direction. Close the loop with a simple yaw model,
-      // where the clamped steer drives the yaw rate as VehicleAi and VehicleMotor do, and check
-      // that the heading holds.
+      // leaves a few millimetres in a random direction. Close the loop with a simple yaw model
+      // that follows VehicleAi's chain (convert to a turn input, clamp to +/-1, and the motor
+      // delivers that fraction of its yaw acceleration), and check that the heading holds.
       var c = NewController();
       var random = new System.Random(1234);
-      // deg/s^2 per unit of (clamped) steer. Stiff enough that the old exact-zero guard spins
-      // through ~280 degrees in these 6 s, close to the ~330 deg/s spin seen in the editor.
-      const float yawAcceleration = 500f;
+      // the follower sample's measured full-input yaw acceleration (rad/s^2)
+      const float maxYawAcceleration = 27.9f;
       float yaw = 131f;
       float yawRate = 0f;
 
@@ -126,7 +125,8 @@ namespace Yohash.Propulsion.Tests
         };
         float steer = c.Update(Dt, Heading(yaw), target, At(Vector3.zero)).Item2;
 
-        yawRate += Mathf.Clamp(steer, -1f, 1f) * yawAcceleration * Dt;
+        float input = Mathf.Clamp(VehicleMotor.YawAccelerationToInput(steer, maxYawAcceleration), -1f, 1f);
+        yawRate += input * maxYawAcceleration * Mathf.Rad2Deg * Dt;
         yaw += yawRate * Dt;
         minYaw = Mathf.Min(minYaw, yaw);
         maxYaw = Mathf.Max(maxYaw, yaw);
