@@ -297,6 +297,112 @@ namespace Yohash.Propulsion.Tests
       Assert.Less((w - spin).magnitude, 1e-2f);
     }
 
+    // Steps a free rigid body whose principal axes are rotated away from its local axes, driving
+    // it from identity towards a rotation about a single world axis. Returns the largest angular
+    // velocity seen off that axis. `torqueOverride` lets a test substitute a different torque law.
+    private static float MaxCrossAxisAngularVelocity(
+      StablePdController c,
+      Vector3 axis,
+      Vector3 inertiaTensor,
+      Quaternion inertiaTensorRotation,
+      Func<Quaternion, Vector3, Quaternion, Vector3> torqueOverride,
+      out Quaternion final,
+      out float peakAngularSpeed
+    )
+    {
+      var target = Quaternion.AngleAxis(90f, axis);
+      var r = Quaternion.identity;
+      var w = Vector3.zero;
+      float maxCross = 0f;
+      peakAngularSpeed = 0f;
+
+      for (int i = 0; i < 400; i++) {
+        var torque = torqueOverride != null
+          ? torqueOverride(r, w, target)
+          : c.ComputeTorque(Dt, inertiaTensorRotation, inertiaTensor, r, w, target, Vector3.zero);
+
+        // the body's true response, inverting the inertia independently of the code under test
+        var principalToWorld = r * inertiaTensorRotation;
+        var local = Quaternion.Inverse(principalToWorld) * torque;
+        var alpha = principalToWorld * new Vector3(
+          local.x / inertiaTensor.x, local.y / inertiaTensor.y, local.z / inertiaTensor.z);
+
+        w += alpha * Dt;
+        r = PropulsionMath.Integrate(r, w, Dt);
+
+        maxCross = Mathf.Max(maxCross, (w - Vector3.Dot(w, axis) * axis).magnitude);
+        peakAngularSpeed = Mathf.Max(peakAngularSpeed, w.magnitude);
+      }
+      final = r;
+      return maxCross;
+    }
+
+    [Test]
+    public void RotationWithMisalignedInertiaHasNoCrossAxisMotion()
+    {
+      // the reviewer's §5 setup: inertia (1, 4, 12), principal axes at Euler (45, 30, 0)
+      // (Unity's Euler order is Z, then X, then Y, so this equals AngleAxis(30, Y) * AngleAxis(45, X))
+      var c = new StablePdController(2f, 1f);
+      var inertiaTensor = new Vector3(1f, 4f, 12f);
+      var inertiaTensorRotation = Quaternion.AngleAxis(30f, Vector3.up) * Quaternion.AngleAxis(45f, Vector3.right);
+      var axis = Vector3.up;
+
+      float cross = MaxCrossAxisAngularVelocity(
+        c, axis, inertiaTensor, inertiaTensorRotation, null, out var final, out float peak);
+
+      // with correct inertia handling, the body rotates purely about the error axis
+      Assert.Greater(peak, 1f, "the body should have rotated substantially");
+      Assert.Less(cross, 1e-3f, "angular velocity strayed off the rotation axis");
+      var target = Quaternion.AngleAxis(90f, axis);
+      float errorDegrees = PropulsionMath.ToRotationVector(final * Quaternion.Inverse(target)).magnitude * Mathf.Rad2Deg;
+      Assert.Less(errorDegrees, 0.05f);
+
+      // sensitivity check: the reversed composition order removed in 0.6
+      // (inertiaTensorRotation * rotation) visibly couples the axes in this setup
+      Func<Quaternion, Vector3, Quaternion, Vector3> reversedOrder = (r, w, t) => {
+        var alpha = c.ComputeAngularAcceleration(Dt, r, w, t, Vector3.zero);
+        var wrong = inertiaTensorRotation * r;
+        var p = Quaternion.Inverse(wrong) * alpha;
+        p.Scale(inertiaTensor);
+        return wrong * p;
+      };
+      float wrongCross = MaxCrossAxisAngularVelocity(
+        c, axis, inertiaTensor, inertiaTensorRotation, reversedOrder, out _, out _);
+      Assert.Greater(wrongCross, 100f * Mathf.Max(cross, 1e-5f),
+        "the reversed order should produce clearly larger cross-axis motion");
+    }
+
+    [Test]
+    public void RampLagWithoutTrackingIsDampingOverStiffnessTimesSpeed()
+    {
+      // a target moving at constant speed, fed to the controller without its velocity
+      // (the samples' "NoTracking" setup), settles to a steady lag of D / K * v
+      var c = new StablePdController(2f, 1f);
+      c.GetDiscreteGains(Dt, out float stiffness, out float damper);
+      const float speed = 1f;
+
+      // about 16 cm at 2 Hz, 1 m/s, which is what the 1D sample shows in the editor
+      float lag = RampLag(c, speed, tracking: false);
+      Assert.AreEqual(damper / stiffness * speed, lag, 1e-4);
+      Assert.AreEqual(0.16f, lag, 0.005f);
+
+      // and tracking the target's velocity removes the lag entirely
+      Assert.AreEqual(0f, RampLag(c, speed, tracking: true), 1e-4);
+    }
+
+    // how far a unit-mass body trails a target moving at constant speed, once settled
+    private static float RampLag(StablePdController c, float speed, bool tracking)
+    {
+      float p = 0f, v = 0f, target = 0f;
+      for (int i = 0; i < 500; i++) {
+        float a = c.ComputeAcceleration(Dt, p, v, target, tracking ? speed : 0f);
+        v += a * Dt;
+        p += v * Dt;
+        target += speed * Dt;
+      }
+      return target - p;
+    }
+
     [Test]
     public void RotationTakesShortestPath()
     {
