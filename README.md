@@ -142,7 +142,7 @@ float turn = pid.ComputeAngle(Time.fixedDeltaTime, currentAngleDegrees, targetAn
 
 ### Sample requirements
 
-- **Input handling (vehicle samples).** *Ground vehicle* and *Vehicle AI follower* read the keyboard through the legacy `UnityEngine.Input` class. New Unity 6 projects default to the Input System package only, and in that mode these two scenes throw an `InvalidOperationException` every frame. Set **Edit > Project Settings > Player > Other Settings > Active Input Handling** to **Input Manager (Old)** or **Both**. The four controller samples don't read input and work with any setting.
+- **Input handling.** All samples work with any **Active Input Handling** setting (**Edit > Project Settings > Player > Other Settings**). The two vehicle samples read WASD from the Input System package's `Keyboard` when it's active (the Unity 6 default, or *Both*), and otherwise from the legacy `UnityEngine.Input`. They only use the Input System when that package is installed (detected through a `versionDefines` entry in their assembly definitions), and the package itself doesn't depend on it. The four controller samples don't read input.
 - **Render pipeline.** The sample materials use the Built-in Render Pipeline's Standard shader. In a URP or HDRP project they render magenta until converted, with **Window > Rendering > Render Pipeline Converter** (Material Upgrade). The controllers themselves don't depend on the render pipeline.
 
 ## Tests
