@@ -49,12 +49,12 @@
     },
     {
       "displayName": "Ground vehicle",
-      "description": "Drives a physics-based car with the keyboard (WASD) through the VehicleMotor.",
+      "description": "Drives a physics-based car with the keyboard (WASD) through the VehicleMotor. Requires Active Input Handling set to Input Manager (Old) or Both.",
       "path": "Samples~/GroundVehicle"
     },
     {
       "displayName": "Vehicle AI follower",
-      "description": "Uses the VehiclePdController as an AI that matches the trajectory of a user-controlled (WASD) vehicle.",
+      "description": "Uses the VehiclePdController as an AI that matches the trajectory of a user-controlled (WASD) vehicle. Requires Active Input Handling set to Input Manager (Old) or Both.",
       "path": "Samples~/VehiclePdFollower"
     }
   ],
