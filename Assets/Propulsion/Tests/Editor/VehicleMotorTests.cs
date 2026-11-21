@@ -39,6 +39,92 @@ namespace Yohash.Propulsion.Tests
       Assert.AreEqual(expected, VehicleMotor.YawAccelerationPerUnitTorque(rotation, inertia), 1e-5);
     }
 
+    [Test]
+    public void MaxYawAccelerationAndInputConversionUseTheRigidbody()
+    {
+      // the instance conversion VehicleAi uses, on a real Rigidbody with a known,
+      // non-identity inertia tensor
+      var go = new GameObject("VehicleMotorTest");
+      try {
+        var rb = go.AddComponent<Rigidbody>();
+        rb.automaticInertiaTensor = false;
+        rb.inertiaTensor = new Vector3(2f, 5f, 3f);
+        rb.inertiaTensorRotation = Quaternion.AngleAxis(30f, Vector3.forward);
+        var motor = go.AddComponent<VehicleMotor>();
+        motor.TurningPower = 120f;
+
+        float expected = 120f * VehicleMotor.YawAccelerationPerUnitTorque(rb.inertiaTensorRotation, rb.inertiaTensor);
+        Assert.Greater(expected, 0f);
+        Assert.AreEqual(expected, motor.MaxYawAcceleration, expected * 1e-4);
+        Assert.AreEqual(3f / expected, motor.YawAccelerationToInput(3f), 1e-4);
+        Assert.AreEqual(-0.5f, motor.YawAccelerationToInput(-0.5f * expected), 1e-4);
+
+        // a motor that can't turn asks for nothing, rather than dividing by zero
+        motor.TurningPower = 0f;
+        float input = motor.YawAccelerationToInput(3f);
+        Assert.IsFalse(float.IsNaN(input) || float.IsInfinity(input));
+        Assert.AreEqual(0f, input, 0.0);
+      } finally {
+        Object.DestroyImmediate(go);
+      }
+    }
+
+    // Closed loop: a 30 degree heading step through VehicleAi's chain (controller, conversion,
+    // clamp to +/-1), with a yaw model where a full input delivers `efficiency` of the
+    // motor's nominal yaw acceleration.
+    private const float FollowerMaxYawAcceleration = 27.9f;   // measured on the follower sample
+
+    private static void TurnStep(bool convert, float efficiency,
+      out int signFlips, out float overshootDegrees, out float finalDegrees)
+    {
+      var c = new VehiclePdController(1f, 1f, new StablePdController(2f, 1f));
+      var target = new Trajectory { Position = Quaternion.AngleAxis(30f, Vector3.up) * Vector3.forward * 1000f };
+      float yaw = 0f, yawRate = 0f, peak = 0f, lastInput = 0f;
+      signFlips = 0;
+      for (int i = 0; i < 150; i++) {
+        float yawAcceleration = c.Update(Dt, new Pose(Vector3.zero, Quaternion.AngleAxis(yaw, Vector3.up)), target, new Trajectory()).Item2;
+        float raw = convert
+          ? VehicleMotor.YawAccelerationToInput(yawAcceleration, FollowerMaxYawAcceleration)
+          : yawAcceleration;   // the pre-0.6 VehicleAi: clamp the rad/s^2 directly
+        float input = Mathf.Clamp(raw, -1f, 1f);
+        if (i > 0 && Mathf.Abs(input) > 0.05f && Mathf.Sign(input) != Mathf.Sign(lastInput)) { signFlips++; }
+        lastInput = input;
+
+        yawRate += input * FollowerMaxYawAcceleration * efficiency * Mathf.Rad2Deg * Dt;
+        yaw += yawRate * Dt;
+        peak = Mathf.Max(peak, yaw);
+      }
+      overshootDegrees = peak - 30f;
+      finalDegrees = yaw;
+    }
+
+    [Test]
+    public void ConvertedSteeringTurnsWithoutChatter()
+    {
+      TurnStep(convert: true, efficiency: 1f, out int flips, out float overshoot, out float final);
+      Assert.LessOrEqual(flips, 1, "steering chattered");
+      Assert.Less(overshoot, 0.1f);
+      Assert.AreEqual(30f, final, 0.01);
+
+      // the pre-0.6 direct clamp: bang-bang, flipping almost every step, and never settling
+      TurnStep(convert: false, efficiency: 1f, out int oldFlips, out _, out float oldFinal);
+      Assert.Greater(oldFlips, 50);
+      Assert.Greater(Mathf.Abs(oldFinal - 30f), 0.5f);
+    }
+
+    [Test]
+    public void GroundFrictionMakesTheTurnLessDampedButItStillSettles()
+    {
+      // A full input delivered 0.36 of MaxYawAcceleration on the ground in the sample. As the
+      // MaxYawAcceleration docs say, that lowers the damping ratio by about sqrt(0.36) = 0.6,
+      // so the critically damped turn now overshoots a little, but it settles without chatter.
+      TurnStep(convert: true, efficiency: 0.36f, out int flips, out float overshoot, out float final);
+      Assert.LessOrEqual(flips, 1);
+      Assert.Greater(overshoot, 1f, "expected the reduced damping to show");
+      Assert.Less(overshoot, 6f);
+      Assert.AreEqual(30f, final, 0.05);
+    }
+
     // the controller's steady yaw acceleration for a target `errorDegrees` to the right
     private static float YawAccelerationFor(float errorDegrees)
     {

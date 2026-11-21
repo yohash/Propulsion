@@ -72,11 +72,23 @@ public class VehicleMotor : MonoBehaviour
     sidewaysFrictionForce = f;
   }
 
+  /// <summary>The torque (N m, about the vehicle's local up axis) of a full turn input.</summary>
+  public float TurningPower {
+    get { return turningPower; }
+    set { turningPower = value; }
+  }
+
   /// <summary>
   /// The yaw angular acceleration (rad/s^2, about the vehicle's local up axis) that a full
-  /// turn input of 1 produces: turningPower divided by the Rigidbody's effective moment of
-  /// inertia about that axis. Ground friction and damping, which this ignores, make the real
-  /// value somewhat lower; feedback controllers correct for the difference.
+  /// turn input of 1 produces on a free body: turningPower divided by the Rigidbody's
+  /// effective moment of inertia about that axis.
+  ///
+  /// This is an upper bound. On the ground, wheel friction resists the turn; in the follower
+  /// sample a full input delivered only about 0.36 of this from rest. To the extent friction
+  /// scales the delivered turning by a factor f < 1, it lowers a turn controller's effective
+  /// frequency by about sqrt(f), and its damping ratio by about sqrt(f) too (roughly 0.6x at
+  /// f = 0.36), so the response is softer and less damped than tuned. Raise the controller's
+  /// damping, or calibrate f, to compensate.
   /// </summary>
   public float MaxYawAcceleration {
     get {
@@ -92,8 +104,16 @@ public class VehicleMotor : MonoBehaviour
   /// </summary>
   public float YawAccelerationToInput(float yawAcceleration)
   {
-    float max = MaxYawAcceleration;
-    return max > 0f ? yawAcceleration / max : 0f;
+    return YawAccelerationToInput(yawAcceleration, MaxYawAcceleration);
+  }
+
+  /// <summary>
+  /// The turn input that asks for `yawAcceleration` from a motor whose full input delivers
+  /// `maxYawAcceleration` (both rad/s^2). Returns 0 when the motor can't turn at all.
+  /// </summary>
+  public static float YawAccelerationToInput(float yawAcceleration, float maxYawAcceleration)
+  {
+    return maxYawAcceleration > 0f ? yawAcceleration / maxYawAcceleration : 0f;
   }
 
   /// <summary>
