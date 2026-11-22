@@ -9,8 +9,10 @@ namespace Yohash.Propulsion.Samples.Rotation3d
 
     public Vector3 Torque;
 
-    [Header("Backwards PD controller")]
-    public BackwardsPdController backwardsPdController;
+    // This controller is fed no target angular velocity, to contrast with
+    // StablePdRotationController which tracks it
+    [Header("Stable PD controller")]
+    public StablePdController backwardsPdController;
 
     // cached var
     private Rigidbody rb;
@@ -24,16 +26,17 @@ namespace Yohash.Propulsion.Samples.Rotation3d
     {
       if (AimAtTarget == null) { return; }
 
-      var aimAtDirection = AimAtTarget.transform.position - transform.position;
+      var aimAtDirection = AimAtTarget.position - rb.position;
       var desiredRotation = Quaternion.LookRotation(aimAtDirection, Vector3.up);
 
       Torque = backwardsPdController.ComputeTorque(
         Time.fixedDeltaTime,
-        desiredRotation,
-        transform.rotation,
-        rb.angularVelocity,
         rb.inertiaTensorRotation,
-        rb.inertiaTensor
+        rb.inertiaTensor,
+        rb.rotation,
+        rb.angularVelocity,
+        desiredRotation,
+        Vector3.zero
       );
 
       rb.AddTorque(Torque);

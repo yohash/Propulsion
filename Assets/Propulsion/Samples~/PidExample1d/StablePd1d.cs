@@ -8,12 +8,13 @@ namespace Yohash.Propulsion.Samples.PidExample1d
 
     public float Force;
 
-    public StablePdController2D XStableController;
+    public StablePdController XStableController;
     public float TargetPosition;
     public float TargetLastPosition;
     public float TargetVelocity;
 
     private Rigidbody2D rb;
+    private bool initialized;
 
     private void Awake()
     {
@@ -24,20 +25,19 @@ namespace Yohash.Propulsion.Samples.PidExample1d
     {
       if (Target == null) { return; }
 
-      TargetLastPosition = TargetPosition;
+      // on the first step there is no history, so assume the target is stationary
+      TargetLastPosition = initialized ? TargetPosition : Target.position.x;
       TargetPosition = Target.position.x;
       TargetVelocity = (TargetPosition - TargetLastPosition) / Time.fixedDeltaTime;
+      initialized = true;
 
-      var current = transform.position.x;
-      var velocity = rb.velocity.x;
-
-      Force = XStableController.ComputeForce1D(
+      Force = XStableController.ComputeForce(
         Time.fixedDeltaTime,
-        current,
-        velocity,
+        rb.mass,
+        rb.position.x,
+        rb.linearVelocity.x,
         TargetPosition,
-        TargetVelocity,
-        rb.mass
+        TargetVelocity
       );
 
       rb.AddForce(new Vector2(Force, 0));
