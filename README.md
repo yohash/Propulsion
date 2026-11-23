@@ -1,7 +1,11 @@
 # Propulsion
 Scripts to enable vehicular propulsion, using physics-based systems.
 
-The Unity package lives in [`Assets/Propulsion`](Assets/Propulsion). See its [README](Assets/Propulsion/README.md) for usage, and the [CHANGELOG](Assets/Propulsion/CHANGELOG.md) for release notes and migration guides.
+This repository holds one or more Unity packages, each in its own folder under [`Packages/`](Packages), and a Unity project for developing them. Each package has its own README, CHANGELOG, UPM branch and release tags.
+
+| Package | Folder | Install (UPM branch) | Release tags |
+|---|---|---|---|
+| `com.yohash.propulsion`: MonoBehaviour controllers, vehicle and samples | [`Packages/com.yohash.propulsion`](Packages/com.yohash.propulsion) ([README](Packages/com.yohash.propulsion/README.md), [CHANGELOG](Packages/com.yohash.propulsion/CHANGELOG.md)) | `#upm` | `vX.Y.Z` |
 
 ## Source Material
 
@@ -26,26 +30,54 @@ Papers and other background material live in [`Documentation/`](Documentation). 
 Requires Unity 6 (6000.3) or newer.
 
 1. In the Package Manager, select **+ > Add package from git URL...**
-2. Enter:
+2. Enter the package's UPM branch, or a release tag to pin a version:
 ```
 https://github.com/yohash/Propulsion.git#upm
+https://github.com/yohash/Propulsion.git#v0.6.0
 ```
+
+When a package depends on another package from this repository, install the dependency first. Unity resolves `package.json` dependencies only from package registries, not from git URLs. Each package's README lists what to install.
+
+## Repository layout and development
+
+```
+Packages/
+  com.yohash.propulsion/     an embedded package: package.json, Runtime/, Tests/, Samples~/, docs
+  manifest.json              the development project's manifest (lists packages under testables)
+Assets/                      the development project's assets (empty; Unity requires the folder)
+Documentation/               reference material, kept out of every package
+.github/workflows/           publishing (see Releasing)
+```
+
+Opening the repository in Unity loads each folder under `Packages/` as an **embedded package**. Unity validates its `package.json` dependencies and assembly references exactly as it will for consumers. Each package is listed under `testables` in `Packages/manifest.json`, so its tests appear in **Window > General > Test Runner**.
+
+**Working on samples.** Unity hides folders ending in `~`, so a package's `Samples~` aren't visible in the project. To open or edit them, rename the package's `Samples~` folder to `Samples` (Unity then imports it in place, with the existing `.meta` files, so every GUID is preserved). When you're done, rename it back, and delete the generated `Samples.meta` before committing. Alternatively, import a sample from the package's **Samples** tab in the Package Manager, which copies it into `Assets/Samples/`. Changes made there don't flow back to the package.
 
 ## Releasing
 
-The `upm` branch holds only the package folder, as a subtree split of `Assets/Propulsion`. Publishing is automated by the [Publish UPM workflow](.github/workflows/publish-upm.yml). Whenever `main` has a `package.json` version that has no `vX.Y.Z` tag yet, it updates `upm` and tags it, provided the version's `CHANGELOG.md` entry is dated.
+Each package's UPM branch holds only that package's folder, as a `git subtree split` of it. Publishing is automated: [`publish-upm-package.yml`](.github/workflows/publish-upm-package.yml) is a reusable workflow holding the logic, and each package has a small caller that sets its folder, UPM branch and tag prefix, e.g. [`publish-upm-propulsion.yml`](.github/workflows/publish-upm-propulsion.yml). Whenever `main` has a package version with no release tag yet, the workflow updates that package's UPM branch and tags it, provided the version's `CHANGELOG.md` entry is dated.
 
-To release:
+To release a package:
 
-1. Bump `version` in `Assets/Propulsion/package.json`, and add a `## [X.Y.Z] - Unreleased` entry to `CHANGELOG.md`.
+1. Bump `version` in its `package.json`, and add a `## [X.Y.Z] - Unreleased` entry to its `CHANGELOG.md`.
 2. Before or after merging to `main`, replace `Unreleased` with the release date (`YYYY-MM-DD`). The workflow publishes as soon as `main` has a dated entry. Until then it skips with a warning.
 
-A specific release can then be installed with `https://github.com/yohash/Propulsion.git#vX.Y.Z`.
+To add a package: create `Packages/<package-name>/`, add it to `testables` in `Packages/manifest.json`, and add a caller workflow next to `publish-upm-propulsion.yml` with its own folder, UPM branch (e.g. `upm-core`) and tag prefix (e.g. `core-v`), so its tags can't collide with another package's.
 
-To publish by hand instead (e.g. if the workflow is unavailable), run on an up-to-date `main`:
+To publish by hand instead (e.g. if the workflow is unavailable), run on an up-to-date `main`. For `com.yohash.propulsion`:
 ```
-git subtree split --prefix=Assets/Propulsion --branch upm
+git subtree split --prefix=Packages/com.yohash.propulsion --branch upm
 git push origin upm
 git tag -a vX.Y.Z upm -m "Propulsion Toolkit X.Y.Z"
 git push origin vX.Y.Z
 ```
+
+### Rebuilding a UPM branch
+
+A package's UPM branch must only ever fast-forward, and the workflow refuses to force-push. Moving a package's folder, as in the move from `Assets/Propulsion` to `Packages/com.yohash.propulsion`, changes the split's history, so the branch has to be rebuilt once, deliberately. On an up-to-date `main`:
+```
+git subtree split --prefix=Packages/com.yohash.propulsion --branch upm-rebuilt
+git push --force origin upm-rebuilt:upm
+git branch -D upm-rebuilt
+```
+Existing release tags keep pointing at their original commits, so installs pinned to a tag (e.g. `#v0.6.0`) keep working. Only installs of the branch itself (`#upm`) move to the new history.

@@ -1,0 +1,136 @@
+# Reusable workflow: publishes one Unity package from this repository to its own UPM branch,
+# and tags it, whenever main contains a package version that has not been published yet.
+#
+# Each package has a small caller workflow (publish-upm-<package>.yml) that sets the trigger
+# paths and passes the inputs below.
+#
+# A version is "published" once its tag (<tag-prefix>X.Y.Z) exists. A version is ready to
+# publish once its CHANGELOG entry has a release date:
+#     ## [X.Y.Z] - YYYY-MM-DD
+# While the entry still reads "Unreleased", the run skips with a warning; dating the entry
+# (which touches CHANGELOG.md) triggers the publish.
+#
+# Install a published version with:
+#     https://github.com/yohash/Propulsion.git#<upm-branch>               (latest)
+#     https://github.com/yohash/Propulsion.git#<tag-prefix>X.Y.Z          (pinned)
+
+name: Publish UPM package
+
+on:
+  workflow_call:
+    inputs:
+      package-dir:
+        description: "The package's folder in this repository, e.g. Packages/com.yohash.propulsion"
+        required: true
+        type: string
+      upm-branch:
+        description: "The branch the package is published to, e.g. upm"
+        required: true
+        type: string
+      tag-prefix:
+        description: "Prefix for release tags, e.g. v (v0.6.0) or core-v (core-v1.0.0)"
+        required: true
+        type: string
+      display-name:
+        description: "Name used in tag messages and the run summary"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # one publish at a time per package, so overlapping merges cannot race
+    concurrency:
+      group: publish-upm-${{ inputs.upm-branch }}
+      cancel-in-progress: false
+    env:
+      PACKAGE_DIR: ${{ inputs.package-dir }}
+      UPM_BRANCH: ${{ inputs.upm-branch }}
+      TAG_PREFIX: ${{ inputs.tag-prefix }}
+      DISPLAY_NAME: ${{ inputs.display-name }}
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate inputs
+        run: |
+          if [[ ! -f "$PACKAGE_DIR/package.json" ]]; then
+            echo "::error::package-dir '$PACKAGE_DIR' has no package.json"
+            exit 1
+          fi
+          if ! [[ "$UPM_BRANCH" =~ ^[A-Za-z0-9._/-]+$ && "$TAG_PREFIX" =~ ^[A-Za-z0-9._-]*$ ]]; then
+            echo "::error::upm-branch or tag-prefix contains unexpected characters"
+            exit 1
+          fi
+
+      - name: Read version from package.json
+        id: version
+        run: |
+          VERSION=$(jq -er .version "$PACKAGE_DIR/package.json")
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error file=$PACKAGE_DIR/package.json::version '$VERSION' is not a semantic version"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG_PREFIX$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether this version is already published
+        id: tag_check
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" > /dev/null; then
+            echo "$TAG is already published; nothing to do."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check the CHANGELOG entry is dated
+        id: changelog
+        if: steps.tag_check.outputs.exists == 'false'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          CHANGELOG="$PACKAGE_DIR/CHANGELOG.md"
+          ESCAPED=${VERSION//./\\.}
+          if grep -Eq "^## \[$ESCAPED\] - [0-9]{4}-[0-9]{2}-[0-9]{2}" "$CHANGELOG"; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif grep -Eq "^## \[$ESCAPED\]" "$CHANGELOG"; then
+            echo "::warning file=$CHANGELOG::$VERSION is not published yet: its CHANGELOG entry has no release date. Replace 'Unreleased' with the date (YYYY-MM-DD) to publish it."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error file=$CHANGELOG::package.json is at $VERSION, but CHANGELOG.md has no '## [$VERSION]' entry."
+            exit 1
+          fi
+
+      - name: Configure git identity
+        if: steps.changelog.outputs.ready == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Split subtree and update the UPM branch
+        if: steps.changelog.outputs.ready == 'true'
+        run: |
+          git subtree split --prefix="$PACKAGE_DIR" --branch "$UPM_BRANCH"
+          # Splits are deterministic, so the UPM branch only ever fast-forwards. If this push
+          # is rejected, the branch has diverged from main's history: investigate rather than
+          # force-pushing over what users install from (see "Rebuilding a UPM branch" in the
+          # root README for the deliberate, one-time case).
+          git push origin "$UPM_BRANCH"
+
+      - name: Tag the UPM branch and push
+        if: steps.changelog.outputs.ready == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git tag -a "$TAG" "$UPM_BRANCH" -m "$DISPLAY_NAME $VERSION"
+          git push origin "$TAG"
+          echo "Published $TAG. Install with https://github.com/${GITHUB_REPOSITORY}.git#$TAG" >> "$GITHUB_STEP_SUMMARY"
