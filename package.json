@@ -1,0 +1,67 @@
+{
+  "name": "com.yohash.propulsion",
+  "version": "0.6.0",
+  "displayName": "Propulsion Toolkit",
+  "description": "Physics-based controllers for Rigidbody propulsion. StablePdController matches a target position or rotation (1 or 3 axes) with a physically parameterized response (frequency in Hz, damping ratio) that is unconditionally stable at any timestep. PidController provides a bounded throttle with an integral term. Includes a vehicle motor and AI follower, with comparison samples.",
+  "unity": "6000.3",
+  "documentationUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion/README.md",
+  "changelogUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion/CHANGELOG.md",
+  "licensesUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion/LICENSE.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yohash/Propulsion.git"
+  },
+  "dependencies": {
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0"
+  },
+  "keywords": [
+    "propulsion",
+    "physics",
+    "rigidbody",
+    "controller",
+    "pid",
+    "pd",
+    "stable-pd",
+    "vehicle"
+  ],
+  "samples": [
+    {
+      "displayName": "1-axis translation: PID vs Stable PD",
+      "description": "Compares a PID controller with the Stable PD controller, with and without target-velocity tracking, moving a Rigidbody2D along one axis to match a target's position.",
+      "path": "Samples~/PidExample1d"
+    },
+    {
+      "displayName": "3-axis translation: PID vs Stable PD",
+      "description": "Compares a 3-axis PID controller with the Stable PD controller, with and without target-velocity tracking, moving a Rigidbody under gravity to match a target's position.",
+      "path": "Samples~/PidExample3d"
+    },
+    {
+      "displayName": "2D rotation: PID vs Stable PD",
+      "description": "Compares a PID controller with the Stable PD controller, physically rotating a Rigidbody2D turret to point at a target.",
+      "path": "Samples~/RotationController2d"
+    },
+    {
+      "displayName": "3D rotation: Stable PD",
+      "description": "Uses the Stable PD controller, with and without target angular-velocity tracking, to physically rotate a turret to point at a target while keeping it upright.",
+      "path": "Samples~/RotationController3d"
+    },
+    {
+      "displayName": "Ground vehicle",
+      "description": "Drives a physics-based car with the keyboard (WASD) through the VehicleMotor.",
+      "path": "Samples~/GroundVehicle"
+    },
+    {
+      "displayName": "Vehicle AI follower",
+      "description": "Uses the VehiclePdController as an AI that matches the trajectory of a user-controlled (WASD) vehicle.",
+      "path": "Samples~/VehiclePdFollower"
+    }
+  ],
+  "author": {
+    "name": "Jason Heebl",
+    "email": "jdheebl@gmail.com",
+    "url": "https://www.heebl.com"
+  },
+  "type": "library"
+}
