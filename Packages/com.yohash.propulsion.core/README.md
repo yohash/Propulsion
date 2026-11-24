@@ -70,6 +70,7 @@ Gains solved for the wrong sub-step count still settle at most settings, but los
 ### Units and conventions
 
 - Angles are in **radians**, angular velocities in **rad/s**, and 3D angular quantities are **world space**.
+- **Unity's 2D physics APIs report angular velocity in degrees per second:** classic `Rigidbody2D.angularVelocity` and `UnityEngine.LowLevelPhysics2D.PhysicsBody.angularVelocity` (and so ECSPhysics2D's bodies). Convert with `math.radians(...)` before passing it in. Their angles (`rotation.angle`) are radians and their torques act in radians, so leave those unconverted. Unconverted, the derivative term is about 57× too strong, and the body won't settle.
 - Quaternions should be unit length, as Unity.Mathematics' `rotate` / `mul` assume.
 - To track a moving target rotation, derive its angular velocity with `MotionMath.AngularVelocity(previousTargetRotation, targetRotation, dt)`. For a single-axis angle, use the `float` overload, which is wrap-safe.
 

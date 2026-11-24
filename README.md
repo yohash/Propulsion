@@ -47,9 +47,9 @@ Packages/
   com.yohash.propulsion/       an embedded package: package.json, Runtime/, Tests/, Samples~/, docs
   com.yohash.propulsion.core/  an embedded package: package.json, Runtime/, Tests/, docs
   manifest.json                the development project's manifest (lists packages under testables)
-Assets/                      the development project's assets (empty; Unity requires the folder)
-Documentation/               reference material, kept out of every package
-.github/workflows/           publishing (see Releasing)
+Assets/                        the development project's assets (empty; Unity requires the folder)
+Documentation/                 reference material, kept out of every package
+.github/workflows/             publishing (see Releasing)
 ```
 
 Opening the repository in Unity loads each folder under `Packages/` as an **embedded package**. Unity validates its `package.json` dependencies and assembly references exactly as it will for consumers. Each package is listed under `testables` in `Packages/manifest.json`, so its tests appear in **Window > General > Test Runner**.
