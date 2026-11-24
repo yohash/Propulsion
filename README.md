@@ -51,7 +51,9 @@ Documentation/               reference material, kept out of every package
 
 Opening the repository in Unity loads each folder under `Packages/` as an **embedded package**. Unity validates its `package.json` dependencies and assembly references exactly as it will for consumers. Each package is listed under `testables` in `Packages/manifest.json`, so its tests appear in **Window > General > Test Runner**.
 
-**Working on samples.** Unity hides folders ending in `~`, so a package's `Samples~` aren't visible in the project. To open or edit them, rename the package's `Samples~` folder to `Samples` (Unity then imports it in place, with the existing `.meta` files, so every GUID is preserved). When you're done, rename it back, and delete the generated `Samples.meta` before committing. Alternatively, import a sample from the package's **Samples** tab in the Package Manager, which copies it into `Assets/Samples/`. Changes made there don't flow back to the package.
+**Working on samples.** Unity hides folders ending in `~`, so a package's `Samples~` aren't visible in the project. To open or edit them, rename the package's `Samples~` folder to `Samples` (Unity then imports it in place, with the existing `.meta` files, so every GUID is preserved). When you're done, rename it back, and delete the generated `Samples.meta`. Do this *before committing*, not just before pushing: while the folder is renamed, `git status` shows the whole `Samples~` tree as deleted, plus an untracked `Samples/`. Alternatively, import a sample from the package's **Samples** tab in the Package Manager, which copies it into `Assets/Samples/`. Changes made there don't flow back to the package.
+
+Don't use both at once: delete any imported copy under `Assets/Samples/` before renaming `Samples~` in place. Otherwise the project holds two copies of every sample assembly definition, which is a compile error, and two copies of every asset GUID, which Unity resolves by giving one copy new GUIDs.
 
 ## Releasing
 

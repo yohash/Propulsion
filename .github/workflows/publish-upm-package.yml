@@ -63,8 +63,9 @@ jobs:
             echo "::error::package-dir '$PACKAGE_DIR' has no package.json"
             exit 1
           fi
-          if ! [[ "$UPM_BRANCH" =~ ^[A-Za-z0-9._/-]+$ && "$TAG_PREFIX" =~ ^[A-Za-z0-9._-]*$ ]]; then
-            echo "::error::upm-branch or tag-prefix contains unexpected characters"
+          if ! [[ "$UPM_BRANCH" =~ ^[A-Za-z0-9._/-]+$ && "$TAG_PREFIX" =~ ^[A-Za-z0-9._-]+$ ]]; then
+            # a non-empty tag prefix keeps each package's tags from colliding with another's
+            echo "::error::upm-branch or tag-prefix is empty or contains unexpected characters"
             exit 1
           fi
 
