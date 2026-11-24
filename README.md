@@ -6,6 +6,7 @@ This repository holds one or more Unity packages, each in its own folder under [
 | Package | Folder | Install (UPM branch) | Release tags |
 |---|---|---|---|
 | `com.yohash.propulsion`: MonoBehaviour controllers, vehicle and samples | [`Packages/com.yohash.propulsion`](Packages/com.yohash.propulsion) ([README](Packages/com.yohash.propulsion/README.md), [CHANGELOG](Packages/com.yohash.propulsion/CHANGELOG.md)) | `#upm` | `vX.Y.Z` |
+| `com.yohash.propulsion.core`: the Burst-compatible math core, over Unity.Mathematics | [`Packages/com.yohash.propulsion.core`](Packages/com.yohash.propulsion.core) ([README](Packages/com.yohash.propulsion.core/README.md), [CHANGELOG](Packages/com.yohash.propulsion.core/CHANGELOG.md)) | `#upm-core` | `core-vX.Y.Z` |
 
 ## Source Material
 
@@ -34,6 +35,7 @@ Requires Unity 6 (6000.3) or newer.
 ```
 https://github.com/yohash/Propulsion.git#upm
 https://github.com/yohash/Propulsion.git#v0.6.0
+https://github.com/yohash/Propulsion.git#upm-core
 ```
 
 When a package depends on another package from this repository, install the dependency first. Unity resolves `package.json` dependencies only from package registries, not from git URLs. Each package's README lists what to install.
@@ -42,8 +44,9 @@ When a package depends on another package from this repository, install the depe
 
 ```
 Packages/
-  com.yohash.propulsion/     an embedded package: package.json, Runtime/, Tests/, Samples~/, docs
-  manifest.json              the development project's manifest (lists packages under testables)
+  com.yohash.propulsion/       an embedded package: package.json, Runtime/, Tests/, Samples~/, docs
+  com.yohash.propulsion.core/  an embedded package: package.json, Runtime/, Tests/, docs
+  manifest.json                the development project's manifest (lists packages under testables)
 Assets/                      the development project's assets (empty; Unity requires the folder)
 Documentation/               reference material, kept out of every package
 .github/workflows/           publishing (see Releasing)

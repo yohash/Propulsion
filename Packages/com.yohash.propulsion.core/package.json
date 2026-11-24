@@ -1,0 +1,35 @@
+{
+  "name": "com.yohash.propulsion.core",
+  "version": "0.1.0",
+  "displayName": "Propulsion Core",
+  "description": "The Burst-compatible math core of the Propulsion Toolkit, over Unity.Mathematics. StablePd matches a target position or rotation (1, 2 or 3 axes) with a physically parameterized response (frequency in Hz, damping ratio), solved exactly for the physics engine's integrator, including sub-stepping engines, and unconditionally stable. Pid provides a bounded throttle with an integral term. No dependency on UnityEngine physics, Entities or any physics package.",
+  "unity": "6000.3",
+  "documentationUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.core/README.md",
+  "changelogUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.core/CHANGELOG.md",
+  "licensesUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.core/LICENSE.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yohash/Propulsion.git"
+  },
+  "dependencies": {
+    "com.unity.mathematics": "1.3.2"
+  },
+  "keywords": [
+    "propulsion",
+    "physics",
+    "controller",
+    "pid",
+    "pd",
+    "stable-pd",
+    "burst",
+    "dots",
+    "mathematics"
+  ],
+  "author": {
+    "name": "Jason Heebl",
+    "email": "jdheebl@gmail.com",
+    "url": "https://www.heebl.com"
+  },
+  "type": "library"
+}
