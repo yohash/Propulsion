@@ -5,7 +5,7 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-11-25
 
 The first release: the Propulsion Toolkit's controllers as a Burst-compatible core over Unity.Mathematics, with no dependency on UnityEngine physics, Entities or any physics package.
 
