@@ -1,0 +1,33 @@
+{
+    "name": "yohash.propulsion.core.tests.burst",
+    "rootNamespace": "Yohash.Propulsion.Core.Tests.Burst",
+    "references": [
+        "yohash.propulsion.core",
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "PROPULSION_CORE_BURST"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.burst",
+            "expression": "1.8.0",
+            "define": "PROPULSION_CORE_BURST"
+        }
+    ],
+    "noEngineReferences": false
+}
