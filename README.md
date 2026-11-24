@@ -56,6 +56,9 @@ The 1-axis and 2D overloads work the same way: `float` or `float2` positions, an
 | Force or torque, on an engine that integrates once per step: PhysX `Rigidbody`, or classic `Rigidbody2D` (its measured response in `com.yohash.propulsion`'s 2D sample matches a single step) | `1` |
 | Force or torque on a sub-stepping engine, e.g. **ECSPhysics2D** / `UnityEngine.LowLevelPhysics2D` (Box2D v3) | its sub-step count, e.g. `PhysicsWorldConfig.SimulationSubSteps` (**4** by default) |
 | A velocity change or impulse at the start of the step (`v += a * dt`, or `m * a * dt`) | `1`, whatever the engine |
+| **Unity Physics** (`com.unity.physics`): it has no force accumulator, so a system changes `PhysicsVelocity` before the step, e.g. `ApplyLinearImpulse(mass, m * a * dt)`. That's the row above. | `1`, even when `PhysicsStep.SubstepCount` > 1 |
+
+The Unity Physics row follows from how it applies velocity changes; it hasn't been measured in the engine yet.
 
 Gains solved for the wrong sub-step count still settle at most settings, but lose the exact tuning. At low damping they can go unstable: for example, 1-step gains at 10 Hz and damping 0.1, run under 4 sub-steps.
 
