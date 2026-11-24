@@ -7,7 +7,7 @@ This package contains code adapted from the third-party projects below. Each is 
 - Source: https://github.com/vazgriz/PID_Controller (see also https://vazgriz.com/621/pid-controllers/)
 - Author: vazgriz
 - License: MIT
-- Used in: `Runtime/Pid.cs`
+- Used in: `Runtime/Pid/`
 
 The upstream license does not name a copyright holder; it is reproduced verbatim below.
 
@@ -40,7 +40,7 @@ SOFTWARE.
 - Source: https://github.com/Phong13/UsefulUtils (see also http://digitalopus.ca/site/pd-controllers/)
 - Author: Ian Deane
 - License: MIT
-- Used in: `Runtime/StablePd.cs` and `Runtime/MotionMath.cs` (the quaternion and inertia-tensor handling)
+- Used in: `Runtime/StablePd/` and `Runtime/MotionMath.cs` (the quaternion and inertia-tensor handling)
 
 ```
 MIT License
