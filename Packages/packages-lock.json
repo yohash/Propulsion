@@ -142,6 +142,15 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "com.yohash.propulsion": {
+      "version": "file:com.yohash.propulsion",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.modules.physics2d": "1.0.0"
+      }
+    },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
       "depth": 0,

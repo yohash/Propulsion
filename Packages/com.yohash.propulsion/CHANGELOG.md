@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The package's source moved from `Assets/Propulsion` to `Packages/com.yohash.propulsion` in the repository, to make room for more packages alongside it. The package's contents are unchanged, apart from its documentation, changelog and license URLs
+- The `upm` branch was rebuilt on the new folder's history. Installs pinned to a release tag (e.g. `#v0.6.0`) are unaffected. Installs of `#upm` move to the rebuilt branch on their next update, and installs pinned to a `upm` commit hash should switch to a release tag
+
 ## [0.6.0] - 2026-11-21
 
 This release converges the PD controllers into a single, physically exact controller.

@@ -1,0 +1,30 @@
+# Publishes com.yohash.propulsion (the MonoBehaviour package) to the `upm` branch, tagged
+# vX.Y.Z. The publishing logic lives in publish-upm-package.yml.
+#
+# Install with:
+#     https://github.com/yohash/Propulsion.git#upm      (latest)
+#     https://github.com/yohash/Propulsion.git#vX.Y.Z   (pinned)
+
+name: Publish UPM (com.yohash.propulsion)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Packages/com.yohash.propulsion/package.json'
+      - 'Packages/com.yohash.propulsion/CHANGELOG.md'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    # a manual run from any other branch must never publish
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-upm-package.yml
+    with:
+      package-dir: Packages/com.yohash.propulsion
+      upm-branch: upm
+      tag-prefix: v
+      display-name: Propulsion Toolkit
