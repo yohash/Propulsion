@@ -1,0 +1,32 @@
+{
+    "name": "Yohash.Propulsion.Entities.Samples.PdBodies2D",
+    "rootNamespace": "Yohash.Propulsion.Entities.Samples",
+    "references": [
+        "yohash.propulsion.core",
+        "yohash.propulsion.entities",
+        "yohash.propulsion.entities.physics2d",
+        "ECSPhysics2D.Core.Runtime",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Transforms",
+        "Unity.Burst",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "PROPULSION_ECSPHYSICS2D"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.ecsphysics2d.core",
+            "expression": "0.3.0",
+            "define": "PROPULSION_ECSPHYSICS2D"
+        }
+    ],
+    "noEngineReferences": false
+}
