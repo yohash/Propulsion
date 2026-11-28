@@ -44,7 +44,7 @@ namespace Yohash.Propulsion.Entities
     /// <summary>
     /// Cancels this body's gravity exactly (the physics world's gravity times the body's
     /// gravity scale), so the body holds its target with no sag. Without it, the body settles
-    /// g / K below the target (about 6 cm at 2 Hz).
+    /// g / K below the target (about 7.6 cm at 2 Hz with 60 Hz physics).
     ///
     /// Only gravity is cancelled. Every other force still acts on the body, and the controller
     /// pushes back against it at its tuned stiffness.

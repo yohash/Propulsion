@@ -25,7 +25,7 @@ Pin releases with tags instead, e.g. `#core-v0.1.0` and `#entities-v0.1.0`. Enti
 
 ## Quick start
 
-**In the editor:** add **Propulsion > PD Body 2D** (`PdBody2DAuthoring`) to a GameObject in a subscene whose entity also gets an ECSPhysics2D body. The targets start where the GameObject is placed, so by default the body holds its position and heading.
+**In the editor:** add **Propulsion > PD Body 2D** (`PdBody2DAuthoring`) to a GameObject in a subscene whose entity also gets an ECSPhysics2D body. The targets start where the GameObject is placed, so by default the body holds its position and heading. (The position target is for the body's **centre of mass**: a body whose shapes are offset from the GameObject shifts on start so that its centre of mass lands there.)
 
 **In code:** add the components to any dynamic body.
 
@@ -107,7 +107,7 @@ using the physics engine's own `dt`. You then only ever write the target positio
 
 ## Gravity
 
-`CompensateGravity` (on by default in authoring) cancels exactly the gravity acting on the body: the physics world's gravity times the body's gravity scale, read each step, so a negative or changing gravity scale works too. Without it, a position controller settles `g / K` below its target, about 6 cm at 2 Hz.
+`CompensateGravity` (on by default in authoring) cancels exactly the gravity acting on the body: the physics world's gravity times the body's gravity scale, read each step, so a negative or changing gravity scale works too. Without it, a position controller settles `g / K` below its target, about 7.6 cm at 2 Hz with 60 Hz physics.
 
 Only gravity is cancelled. Every other force still acts on the body, which is what lets a controlled body be pushed around. A body resting on the ground with a target above it lifts off and hovers there.
 
@@ -122,7 +122,7 @@ Only gravity is cancelled. Every other force still acts on the body, which is wh
 - **Timestep:** `PhysicsWorldSingleton.FixedDeltaTime`, the `dt` ECSPhysics2D simulates its worlds with. It can differ from the fixed-step group's `Time.DeltaTime`.
 - **Sub-steps:** read per body from the live physics world it belongs to, so several worlds with different sub-step counts are handled.
 - **Schedule:** `Propulsion2DSystemGroup` is in `FixedStepSimulationSystemGroup`, after `BuildPhysicsWorldSystem`, `ShapeCreationSystem` and `CompoundShapeBuilderSystem`, and before `PhysicsSimulationSystem`. It runs `PdTargetVelocity2DSystem`, then `PdPosition2DSystem` and `PdRotation2DSystem`.
-- **Sleeping bodies** are left asleep while the force they'd get is negligible, so a body resting on its target doesn't keep itself awake.
+- **Sleeping bodies** are left asleep while the net acceleration they'd feel (the controller's output plus gravity) is negligible, so a body resting on its target, gravity-compensated or not, falls asleep and stays asleep. Moving its target wakes it.
 - The systems run on the main thread, as ECSPhysics2D's own force systems do.
 
 ## Sample
@@ -156,4 +156,4 @@ To run them from the package, add it to your project's `testables`:
 
 ## License
 
-MIT. See [LICENSE.md](LICENSE.md).
+MIT. See [LICENSE.md](LICENSE.md) and [Third Party Notices.md](Third%20Party%20Notices.md).

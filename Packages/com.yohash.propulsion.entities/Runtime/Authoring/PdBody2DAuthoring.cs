@@ -12,6 +12,11 @@ namespace Yohash.Propulsion.Entities
   /// at the GameObject's position and Z rotation, so by default the body holds where it was
   /// placed. Your systems then move the targets at runtime.
   ///
+  /// The position controller drives the body's <b>centre of mass</b>. For shapes centred on the
+  /// GameObject that is the GameObject's position. If the shapes are offset (or unevenly dense),
+  /// the body shifts on its first steps so that its centre of mass lands where the GameObject
+  /// was; set the target from the body's centre of mass at runtime if that matters.
+  ///
   /// This component does nothing at runtime on its own: it needs a physics backend, e.g. the
   /// ECSPhysics2D backend, which compiles when <c>com.ecsphysics2d.core</c> is installed.
   /// </summary>
@@ -20,7 +25,7 @@ namespace Yohash.Propulsion.Entities
   public class PdBody2DAuthoring : MonoBehaviour
   {
     [Header("Position")]
-    [Tooltip("Drive the body's centre of mass towards a target position with a force.")]
+    [Tooltip("Drive the body's centre of mass towards a target position with a force. The target starts at this GameObject's position: a body whose shapes are offset from it shifts so that its centre of mass lands there.")]
     public bool ControlPosition = true;
 
     [Tooltip("Natural frequency of the position response, in Hz. With damping 1, the error falls to ~5% after about 0.75 / frequency seconds.")]

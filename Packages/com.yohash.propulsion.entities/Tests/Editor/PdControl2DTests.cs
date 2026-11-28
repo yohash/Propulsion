@@ -123,7 +123,7 @@ namespace Yohash.Propulsion.Entities.Tests
         float2 a = PdControl2D.Acceleration(ref pd, p, v, Gravity, Dt, SubSteps) + Gravity;
         SubSteppedIntegrator.Step(ref p, ref v, a, Dt, SubSteps);
       }
-      float sag = 9.81f / pd.Cache.Gains.Stiffness;   // about 6 cm at 2 Hz
+      float sag = 9.81f / pd.Cache.Gains.Stiffness;   // about 7.6 cm at 2 Hz, 60 Hz physics
       Assert.AreEqual(3f - sag, p.y, 1e-4f);
       Assert.Greater(sag, 0.05f);
     }

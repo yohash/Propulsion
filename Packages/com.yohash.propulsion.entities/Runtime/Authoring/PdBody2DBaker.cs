@@ -6,7 +6,9 @@ namespace Yohash.Propulsion.Entities
 {
   /// <summary>
   /// Bakes <see cref="PdBody2DAuthoring"/>. The targets start at the GameObject's world
-  /// position (x, y) and its rotation about Z, so the body holds where it was placed.
+  /// position (x, y) and its rotation about Z, so the body holds where it was placed. The
+  /// position target is for the body's centre of mass, which is the GameObject's position only
+  /// for centred shapes (there is no body to read the centre of mass from at bake time).
   /// </summary>
   public class PdBody2DBaker : Baker<PdBody2DAuthoring>
   {

@@ -20,15 +20,17 @@ namespace Yohash.Propulsion.Entities.Physics2D
   /// step. Nothing on the body is ever overwritten, so the controller combines with every other
   /// force on it.
   ///
-  /// A sleeping body is left asleep while the force it would get is negligible, so a body
-  /// resting on its target doesn't keep itself awake. Any real error wakes it.
+  /// A sleeping body is left asleep while the <b>net</b> acceleration it would feel (the
+  /// controller's output plus gravity) is negligible, so a body resting on its target falls
+  /// asleep and stays asleep, including a gravity-compensated one, whose output alone is never
+  /// near zero. Any real error wakes it: <c>ApplyForceToCenter</c> wakes the body.
   /// </summary>
   [UpdateInGroup(typeof(Propulsion2DSystemGroup))]
   [UpdateAfter(typeof(PdTargetVelocity2DSystem))]
   [BurstCompile]
   public partial struct PdPosition2DSystem : ISystem
   {
-    // Below this (m/s^2), a sleeping body isn't woken.
+    // Below this net acceleration (m/s^2), a sleeping body isn't woken.
     private const float SleepingAccelerationThreshold = 1e-3f;
 
     [BurstCompile]
@@ -53,17 +55,21 @@ namespace Yohash.Propulsion.Entities.Physics2D
 
         var world = physics.GetWorld(worldIndex);
         var body = bodyComponent.ValueRO.Body;
+        float2 gravity = EcsPhysics2DState.Gravity(world, body);
 
         float2 acceleration = PdControl2D.Acceleration(
           ref controller.ValueRW,
           EcsPhysics2DState.CenterOfMass(body),
           EcsPhysics2DState.LinearVelocity(body),
-          EcsPhysics2DState.Gravity(world, body),
+          gravity,
           dt,
           EcsPhysics2DState.SubSteps(world)
         );
 
-        if (!body.awake && math.lengthsq(acceleration) < SleepingAccelerationThreshold * SleepingAccelerationThreshold) {
+        // the net acceleration, not the controller's output: with CompensateGravity, the output
+        // includes -gravity even for a body exactly at rest on its target
+        float2 net = acceleration + gravity;
+        if (!body.awake && math.lengthsq(net) < SleepingAccelerationThreshold * SleepingAccelerationThreshold) {
           continue;
         }
         body.ApplyForceToCenter(body.mass * acceleration);

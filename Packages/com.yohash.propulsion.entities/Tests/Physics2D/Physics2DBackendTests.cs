@@ -138,7 +138,7 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
     [Test]
     public void FollowsTheBodysGravityScale()
     {
-      // e.g. Terrabomb's per-team gravity direction: a negative scale flips gravity
+      // e.g. gravity that differs per team or per body: a negative scale flips it
       var start = new float2(0f, 5f);
       var ball = test.CreateBall(start, gravityScale: -2f);
       AddPosition(ball, 2f, 1f, start, compensateGravity: true);
@@ -158,6 +158,56 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
       float gravity = -test.Physics.GetWorld(0).gravity.y;
       float sag = gravity / Position(ball).Cache.Gains.Stiffness;
       Assert.AreEqual(start.y - sag, test.CenterOfMass(ball).y, 1e-3f);
+    }
+
+    [Test]
+    public void ThePositionControllerDrivesTheCentreOfMass()
+    {
+      // the circle sits 0.5 m right of the body's origin, so the centre of mass does too
+      var target = new float2(0f, 5f);
+      var ball = test.CreateBall(target, gravityScale: 1f, shapeOffset: new float2(0.5f, 0f));
+      AddPosition(ball, 2f, 1f, target, compensateGravity: true);
+      for (int k = 0; k < 300; k++) { test.Step(); }
+
+      Assert.Less(math.length(test.CenterOfMass(ball) - target), 1e-3f, "the centre of mass is on target");
+      Assert.Less(math.length(test.Origin(ball) - (target - new float2(0.5f, 0f))), 1e-3f,
+        "so the origin, where the target was baked, has moved by the offset");
+    }
+
+    // ******************************************************************
+    //    SLEEPING
+    // ******************************************************************
+
+    [Test]
+    public void ACompensatedBodyOnItsTargetFallsAsleepAndStaysAsleepUntilTheTargetMoves()
+    {
+      var start = new float2(0f, 5f);
+      var ball = test.CreateBall(start, gravityScale: 1f);
+      AddPosition(ball, 2f, 1f, start, compensateGravity: true);
+      test.EntityManager.AddComponentData(ball, new PdRotation2D { Settings = new StablePdSettings(2f, 1f), TargetAngle = 0f });
+
+      int asleepAt = -1;
+      for (int k = 0; k < 600 && asleepAt < 0; k++) {
+        test.Step();
+        if (!test.Awake(ball)) { asleepAt = k; }
+      }
+      Assert.GreaterOrEqual(asleepAt, 0, "Box2D puts a body at rest on its target to sleep");
+
+      // the controllers' output includes -gravity, but the net acceleration is zero: no wake-ups
+      for (int k = 0; k < 120; k++) {
+        test.Step();
+        Assert.IsFalse(test.Awake(ball), $"woken {k + 1} steps after falling asleep");
+      }
+      Assert.Less(math.length(test.CenterOfMass(ball) - start), 1e-3f, "asleep where it was held");
+
+      // moving the target wakes it, and it goes there
+      var controller = Position(ball);
+      controller.TargetPosition = start + new float2(1f, 0f);
+      test.EntityManager.SetComponentData(ball, controller);
+      test.Step();
+      Assert.IsTrue(test.Awake(ball), "woken by the new target");
+      for (int k = 0; k < 300; k++) { test.Step(); }
+      Assert.Less(math.length(test.CenterOfMass(ball) - controller.TargetPosition), 1e-3f);
     }
 
     // ******************************************************************
