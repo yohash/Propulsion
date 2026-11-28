@@ -210,6 +210,38 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
       Assert.Less(math.length(test.CenterOfMass(ball) - controller.TargetPosition), 1e-3f);
     }
 
+    [Test]
+    public void AnUncompensatedBodyRestingOnTheGroundAtItsTargetStaysAsleep()
+    {
+      // a ball dropped onto a static ground, left to settle and sleep with no controller
+      test.CreateGround(new float2(0f, -0.5f), new float2(20f, 1f));
+      var ball = test.CreateBall(new float2(0f, 0.6f), gravityScale: 1f);
+      int asleepAt = -1;
+      for (int k = 0; k < 600 && asleepAt < 0; k++) {
+        test.Step();
+        if (!test.Awake(ball)) { asleepAt = k; }
+      }
+      Assert.GreaterOrEqual(asleepAt, 0, "the ball settles and sleeps on the ground");
+
+      // now hold it where it rests, without gravity compensation: its output is ~0, its net
+      // acceleration is gravity, which the ground carries. It must not be woken.
+      var resting = test.CenterOfMass(ball);
+      AddPosition(ball, 2f, 1f, resting, compensateGravity: false);
+      for (int k = 0; k < 300; k++) {
+        test.Step();
+        Assert.IsFalse(test.Awake(ball), $"woken {k + 1} steps after the controller was added");
+      }
+
+      // moving the target sideways wakes it, and it rolls there along the ground
+      var controller = Position(ball);
+      controller.TargetPosition = resting + new float2(1f, 0f);
+      test.EntityManager.SetComponentData(ball, controller);
+      test.Step();
+      Assert.IsTrue(test.Awake(ball), "woken by the new target");
+      for (int k = 0; k < 300; k++) { test.Step(); }
+      Assert.AreEqual(controller.TargetPosition.x, test.CenterOfMass(ball).x, 5e-3f);
+    }
+
     // ******************************************************************
     //    FORCES COMBINE
     // ******************************************************************

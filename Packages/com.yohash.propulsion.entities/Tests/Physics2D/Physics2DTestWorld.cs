@@ -66,6 +66,19 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
       return entity;
     }
 
+    /// <summary>A static box, e.g. a ground for bodies to rest on.</summary>
+    public Entity CreateGround(float2 center, float2 size)
+    {
+      var entity = EntityManager.CreateEntity();
+      EntityManager.AddComponentData(entity, LocalTransform.FromPosition(center.x, center.y, 0f));
+      EntityManager.AddComponentData(entity, new PhysicsBodyComponent { WorldIndex = 0, GravityScale = 1f });
+      EntityManager.AddComponent<PhysicsStaticTag>(entity);
+      EntityManager.AddComponentData(entity, new PhysicsMaterial { Friction = 0.6f, Bounciness = 0f, Density = 1f });
+      EntityManager.AddComponentData(entity, CollisionFilter.Default);
+      EntityManager.AddComponentData(entity, new PhysicsShapeBox { Size = size, Center = float2.zero, Rotation = 0f });
+      return entity;
+    }
+
     public UnityEngine.LowLevelPhysics2D.PhysicsBody Body(Entity entity)
     {
       return EntityManager.GetComponentData<PhysicsBodyComponent>(entity).Body;

@@ -122,7 +122,7 @@ Only gravity is cancelled. Every other force still acts on the body, which is wh
 - **Timestep:** `PhysicsWorldSingleton.FixedDeltaTime`, the `dt` ECSPhysics2D simulates its worlds with. It can differ from the fixed-step group's `Time.DeltaTime`.
 - **Sub-steps:** read per body from the live physics world it belongs to, so several worlds with different sub-step counts are handled.
 - **Schedule:** `Propulsion2DSystemGroup` is in `FixedStepSimulationSystemGroup`, after `BuildPhysicsWorldSystem`, `ShapeCreationSystem` and `CompoundShapeBuilderSystem`, and before `PhysicsSimulationSystem`. It runs `PdTargetVelocity2DSystem`, then `PdPosition2DSystem` and `PdRotation2DSystem`.
-- **Sleeping bodies** are left asleep while the net acceleration they'd feel (the controller's output plus gravity) is negligible, so a body resting on its target, gravity-compensated or not, falls asleep and stays asleep. Moving its target wakes it.
+- **Sleeping bodies** stay asleep while either the controller's feedback (its response to position and velocity error) or the net acceleration they'd feel (its output plus gravity) is negligible. So a body at rest on its target stays asleep whether it's hovering with gravity compensated, resting on the ground without it, or hanging at its sag. Moving its target wakes it.
 - The systems run on the main thread, as ECSPhysics2D's own force systems do.
 
 ## Sample

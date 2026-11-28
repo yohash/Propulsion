@@ -20,17 +20,21 @@ namespace Yohash.Propulsion.Entities.Physics2D
   /// step. Nothing on the body is ever overwritten, so the controller combines with every other
   /// force on it.
   ///
-  /// A sleeping body is left asleep while the <b>net</b> acceleration it would feel (the
-  /// controller's output plus gravity) is negligible, so a body resting on its target falls
-  /// asleep and stays asleep, including a gravity-compensated one, whose output alone is never
-  /// near zero. Any real error wakes it: <c>ApplyForceToCenter</c> wakes the body.
+  /// A sleeping body is left asleep while either its <b>feedback</b> (the response to its
+  /// position and velocity error, without feedforward) or its <b>net</b> acceleration (the
+  /// controller's output plus gravity) is negligible. So a body at rest on its target stays
+  /// asleep in every case:
+  ///   - gravity-compensated, hovering: both are zero (its output alone is -gravity);
+  ///   - uncompensated, resting on the ground: its feedback is zero (its net is gravity);
+  ///   - uncompensated, hanging at its sag below the target: its net is zero.
+  /// Moving its target makes both non-zero, and <c>ApplyForceToCenter</c> wakes the body.
   /// </summary>
   [UpdateInGroup(typeof(Propulsion2DSystemGroup))]
   [UpdateAfter(typeof(PdTargetVelocity2DSystem))]
   [BurstCompile]
   public partial struct PdPosition2DSystem : ISystem
   {
-    // Below this net acceleration (m/s^2), a sleeping body isn't woken.
+    // Below this feedback or net acceleration (m/s^2), a sleeping body isn't woken.
     private const float SleepingAccelerationThreshold = 1e-3f;
 
     [BurstCompile]
@@ -66,11 +70,14 @@ namespace Yohash.Propulsion.Entities.Physics2D
           EcsPhysics2DState.SubSteps(world)
         );
 
-        // the net acceleration, not the controller's output: with CompensateGravity, the output
-        // includes -gravity even for a body exactly at rest on its target
-        float2 net = acceleration + gravity;
-        if (!body.awake && math.lengthsq(net) < SleepingAccelerationThreshold * SleepingAccelerationThreshold) {
-          continue;
+        // not the raw output: with CompensateGravity it includes -gravity even for a body at
+        // rest on its target. Feedback covers bodies resting on the ground; net covers
+        // compensated bodies hovering, and uncompensated ones hanging at their sag.
+        if (!body.awake) {
+          float2 feedback = acceleration - PdControl2D.Feedforward(controller.ValueRO, gravity);
+          float2 net = acceleration + gravity;
+          const float threshold2 = SleepingAccelerationThreshold * SleepingAccelerationThreshold;
+          if (math.lengthsq(feedback) < threshold2 || math.lengthsq(net) < threshold2) { continue; }
         }
         body.ApplyForceToCenter(body.mass * acceleration);
       }
