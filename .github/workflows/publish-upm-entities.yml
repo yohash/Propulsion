@@ -1,0 +1,30 @@
+# Publishes com.yohash.propulsion.entities (ECS components and physics backends) to the `upm-entities`
+# branch, tagged entities-vX.Y.Z. The publishing logic lives in publish-upm-package.yml.
+#
+# Install with:
+#     https://github.com/yohash/Propulsion.git#upm-entities        (latest)
+#     https://github.com/yohash/Propulsion.git#entities-vX.Y.Z     (pinned)
+
+name: Publish UPM (com.yohash.propulsion.entities)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Packages/com.yohash.propulsion.entities/package.json'
+      - 'Packages/com.yohash.propulsion.entities/CHANGELOG.md'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    # a manual run from any other branch must never publish
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-upm-package.yml
+    with:
+      package-dir: Packages/com.yohash.propulsion.entities
+      upm-branch: upm-entities
+      tag-prefix: entities-v
+      display-name: Propulsion Entities

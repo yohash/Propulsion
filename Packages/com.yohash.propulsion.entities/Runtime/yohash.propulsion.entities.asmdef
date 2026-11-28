@@ -1,0 +1,21 @@
+{
+    "name": "yohash.propulsion.entities",
+    "rootNamespace": "Yohash.Propulsion.Entities",
+    "references": [
+        "yohash.propulsion.core",
+        "Unity.Entities",
+        "Unity.Entities.Hybrid",
+        "Unity.Mathematics",
+        "Unity.Burst",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

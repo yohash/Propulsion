@@ -7,6 +7,7 @@ This repository holds one or more Unity packages, each in its own folder under [
 |---|---|---|---|
 | `com.yohash.propulsion`: MonoBehaviour controllers, vehicle and samples | [`Packages/com.yohash.propulsion`](Packages/com.yohash.propulsion) ([README](Packages/com.yohash.propulsion/README.md), [CHANGELOG](Packages/com.yohash.propulsion/CHANGELOG.md)) | `#upm` | `vX.Y.Z` |
 | `com.yohash.propulsion.core`: the Burst-compatible math core, over Unity.Mathematics | [`Packages/com.yohash.propulsion.core`](Packages/com.yohash.propulsion.core) ([README](Packages/com.yohash.propulsion.core/README.md), [CHANGELOG](Packages/com.yohash.propulsion.core/CHANGELOG.md)) | `#upm-core` | `core-vX.Y.Z` |
+| `com.yohash.propulsion.entities`: ECS components and systems, with a backend per physics package (ECSPhysics2D) | [`Packages/com.yohash.propulsion.entities`](Packages/com.yohash.propulsion.entities) ([README](Packages/com.yohash.propulsion.entities/README.md), [CHANGELOG](Packages/com.yohash.propulsion.entities/CHANGELOG.md)) | `#upm-entities` | `entities-vX.Y.Z` |
 
 ## Source Material
 
@@ -36,9 +37,10 @@ Requires Unity 6 (6000.3) or newer.
 https://github.com/yohash/Propulsion.git#upm
 https://github.com/yohash/Propulsion.git#v0.6.0
 https://github.com/yohash/Propulsion.git#upm-core
+https://github.com/yohash/Propulsion.git#upm-entities
 ```
 
-When a package depends on another package from this repository, install the dependency first. Unity resolves `package.json` dependencies only from package registries, not from git URLs. Each package's README lists what to install.
+When a package depends on another package from this repository, install the dependency first. For example, `com.yohash.propulsion.entities` needs `com.yohash.propulsion.core`, and a physics package for its backend, installed first. Unity resolves `package.json` dependencies only from package registries, not from git URLs. Each package's README lists what to install.
 
 ## Repository layout and development
 
@@ -46,13 +48,15 @@ When a package depends on another package from this repository, install the depe
 Packages/
   com.yohash.propulsion/       an embedded package: package.json, Runtime/, Tests/, Samples~/, docs
   com.yohash.propulsion.core/  an embedded package: package.json, Runtime/, Tests/, docs
+  com.yohash.propulsion.entities/
+                               an embedded package: Runtime/, one folder per physics backend (Physics2D/), Tests/, Samples~/, docs
   manifest.json                the development project's manifest (lists packages under testables)
 Assets/                        the development project's assets (empty; Unity requires the folder)
 Documentation/                 reference material, kept out of every package
 .github/workflows/             publishing (see Releasing)
 ```
 
-Opening the repository in Unity loads each folder under `Packages/` as an **embedded package**. Unity validates its `package.json` dependencies and assembly references exactly as it will for consumers. Each package is listed under `testables` in `Packages/manifest.json`, so its tests appear in **Window > General > Test Runner**.
+Opening the repository in Unity loads each folder under `Packages/` as an **embedded package**. Unity validates its `package.json` dependencies and assembly references exactly as it will for consumers. Each package is listed under `testables` in `Packages/manifest.json`, so its tests appear in **Window > General > Test Runner**. The project also installs Entities and ECSPhysics2D (pinned to a release tag), so the entities package's ECSPhysics2D backend and its engine tests compile here.
 
 **Working on samples.** Unity hides folders ending in `~`, so a package's `Samples~` aren't visible in the project. To open or edit them, rename the package's `Samples~` folder to `Samples` (Unity then imports it in place, with the existing `.meta` files, so every GUID is preserved). When you're done, rename it back, and delete the generated `Samples.meta`. Do this *before committing*, not just before pushing: while the folder is renamed, `git status` shows the whole `Samples~` tree as deleted, plus an untracked `Samples/`. Alternatively, import a sample from the package's **Samples** tab in the Package Manager, which copies it into `Assets/Samples/`. Changes made there don't flow back to the package.
 

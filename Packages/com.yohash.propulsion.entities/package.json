@@ -1,0 +1,45 @@
+{
+  "name": "com.yohash.propulsion.entities",
+  "version": "0.1.0",
+  "displayName": "Propulsion Entities",
+  "description": "Stable PD control for Unity ECS physics bodies, built on Propulsion Core. Components drive a body's position and rotation towards targets with a physically parameterized response (frequency in Hz, damping ratio), applied as forces that combine with every other force in the scene. Backends compile only when their physics package is installed: ECSPhysics2D (com.ecsphysics2d.core) for 2D. Install com.yohash.propulsion.core first.",
+  "unity": "6000.3",
+  "documentationUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.entities/README.md",
+  "changelogUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.entities/CHANGELOG.md",
+  "licensesUrl": "https://github.com/yohash/Propulsion/blob/main/Packages/com.yohash.propulsion.entities/LICENSE.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yohash/Propulsion.git"
+  },
+  "dependencies": {
+    "com.yohash.propulsion.core": "0.1.0",
+    "com.unity.entities": "1.4.4",
+    "com.unity.burst": "1.8.27",
+    "com.unity.mathematics": "1.3.2"
+  },
+  "keywords": [
+    "propulsion",
+    "physics",
+    "controller",
+    "pd",
+    "stable-pd",
+    "ecs",
+    "dots",
+    "entities",
+    "physics2d"
+  ],
+  "samples": [
+    {
+      "displayName": "PD bodies 2D (ECSPhysics2D)",
+      "description": "Three ECSPhysics2D boxes under gravity driven by PD forces while other forces act on them: one holds its pose and recovers from periodic kicks, one follows a circling target with derived target velocities, and one holds against a constant wind while snapping its heading. Requires com.ecsphysics2d.core.",
+      "path": "Samples~/PdBodies2D"
+    }
+  ],
+  "author": {
+    "name": "Jason Heebl",
+    "email": "jdheebl@gmail.com",
+    "url": "https://www.heebl.com"
+  },
+  "type": "library"
+}
