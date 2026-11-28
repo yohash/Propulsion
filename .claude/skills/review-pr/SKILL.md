@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Review a Propulsion pull request end to end. Check out the PR branch, review the diff for control-law and physics correctness, package and release hygiene and documentation drift, leave inline comments, run the PR's verification steps in the live Unity Editor via the Unity CLI (compile gate, EditMode and Burst tests, samples in Play mode), commit the Unity .meta files and packages-lock.json the PR is missing, post a summary with a verification table, then watch the PR for two hours to re-verify the author's follow-up changes. Use when asked to review, verify or QA a Propulsion PR (e.g. "review PR 5", "/review-pr 5").
+description: Review a Propulsion pull request end to end, keeping the computer awake while it tests. Check out the PR branch, review the diff for control-law and physics correctness, package and release hygiene and documentation drift, leave inline comments, run the PR's verification steps in the live Unity Editor via the Unity CLI (compile gate, EditMode and Burst tests, samples in Play mode), commit the Unity .meta files and packages-lock.json the PR is missing, post a summary with a verification table, then watch the PR for two hours to re-verify the author's follow-up changes. Use when asked to review, verify or QA a Propulsion PR (e.g. "review PR 5", "/review-pr 5").
 ---
 
 # Review & verify a Propulsion PR
@@ -9,18 +9,19 @@ Argument: a PR number or URL (`$ARGUMENTS`). The repo is `yohash/Propulsion`. `g
 
 Work through the phases in order, and keep the user posted after each one.
 
-**Ask before you post or push.** Everything posted to GitHub is outward-facing. Before Phase 3, ask the user once which of these this review may do without asking again:
-- post the inline review (Phase 3) and the summary (Phase 6);
-- commit and push Editor-generated files to the PR branch (Phase 5);
-- post follow-ups during the watch (Phase 7).
+**What running this skill approves.** Everything posted to GitHub is outward-facing, and the repo owner has approved these actions as part of every review. Asking the user to run this skill is the approval: do them as each phase says, without asking again:
+- **keep the computer awake** while you test and watch: request it (e.g. `request_keep_awake` with `until: "session_idle"`) before Phase 5, and release it when the review ends (Phase 7, "When the watch ends"). If the host can't hold it, say so and carry on;
+- **post the inline review** (Phase 3) and **the summary comment** (Phase 6);
+- **commit and push Editor-generated files** to the PR branch (Phase 5);
+- **post follow-up comments** during the watch (Phase 7).
 
-Never approve, request changes, merge, or push anything else unless the user asks.
+If the user limits any of these when they start the review, follow what they say. Never approve, request changes, merge, or push anything else unless the user asks.
 
 **Editor-generated files** are the one kind of fix the reviewer makes rather than sends back. In this repo that means:
 - the Unity `.meta` files for the PR's new files and folders;
 - `Packages/packages-lock.json`, when the PR changes `Packages/manifest.json` or a package's `package.json` dependencies.
 
-Only the Editor writes these correctly: lockfile entries carry registry metadata only Unity knows, and hand-made GUIDs collide. The reviewer has a live Editor at review time, so committing them is the reviewer's job once the user has agreed. Those commits hold Editor output only, never hand edits. Every other fix goes back to the author as a finding.
+Only the Editor writes these correctly: lockfile entries carry registry metadata only Unity knows, and hand-made GUIDs collide. The reviewer has a live Editor at review time, so committing and pushing them is the reviewer's job (see above). Those commits hold Editor output only, never hand edits. Every other fix goes back to the author as a finding.
 
 ## The repo in brief
 
@@ -109,7 +110,7 @@ The test cases are the PR body's **Verification** checklist (often grouped as "I
 
 ## Phase 5: Connect to Unity and verify
 
-Load the `unity:unity-cli` skill. Read memory `unity-cli-bridge-gotchas` first if it exists.
+Load the `unity:unity-cli` skill. Read memory `unity-cli-bridge-gotchas` first if it exists. If you haven't already, keep the computer awake now (see the intro): Play-mode runs and the watch mustn't be cut off by idle sleep.
 
 **Connect:**
 - Run `unity status --json`. If it fails, run `unity pipeline editors --json` and `unity editors running --json` to tell the cases apart:
@@ -139,7 +140,7 @@ Load the `unity:unity-cli` skill. Read memory `unity-cli-bridge-gotchas` first i
 5. **Commit by explicit path** (never `git add -A` or `git add .`), ending with the attribution trailer:
    - metas: `chore: add Unity .meta files for <short scope>`, listing them in the body;
    - the lockfile: `chore: record <packages> in packages-lock.json`, saying which entries Unity added or changed.
-6. **Push** (only if the user agreed): `git push origin HEAD:<headRefName>`.
+6. **Push:** `git push origin HEAD:<headRefName>`.
    - **Push rejected because the author pushed meanwhile:** `git pull --rebase origin <headRefName>`, re-run the compile gate, then push again.
    - **No push access** (e.g. a fork): don't push. Put the files in the summary as a blocking item instead.
 7. Use the new head SHA from here on: Phase 6 reports against it, and Phase 7 takes it as the baseline. Tell the user what you committed.
@@ -237,4 +238,4 @@ Authors usually answer a review within the hour, with fix commits and inline rep
 
 **Working tree:** the user may be working in this checkout between checks. Switch branches only if the tree is clean. Otherwise, read the delta without checking out (`git diff`, `git show`), skip the Unity re-run and the generated-file commits, and say so in the follow-up and to the user. If any new files lack metas, or the delta changes dependencies without a lockfile update, list them in the follow-up.
 
-**When the watch ends,** whether on the sixth check or cancelled early, tell the user what changed, what you verified, and which items are still open. Leave no scheduled jobs behind.
+**When the watch ends,** whether on the sixth check or cancelled early, tell the user what changed, what you verified, and which items are still open. Leave no scheduled jobs behind, and release the keep-awake hold. A `session_idle` hold lets go on its own once the session goes quiet; tell the user that it has been, or will be, released.
