@@ -1,5 +1,5 @@
 {
-    "name": "Yohash.Propulsion.Entities.Samples.PdBodies2D",
+    "name": "yohash.propulsion.entities.samples.pdbodies2d",
     "rootNamespace": "Yohash.Propulsion.Entities.Samples",
     "references": [
         "yohash.propulsion.core",

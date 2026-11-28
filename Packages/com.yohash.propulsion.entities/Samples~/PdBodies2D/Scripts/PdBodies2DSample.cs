@@ -4,6 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using Yohash.Propulsion.Core;
+using PhysicsMaterial = ECSPhysics2D.PhysicsMaterial;
 
 namespace Yohash.Propulsion.Entities.Samples
 {

@@ -5,6 +5,7 @@
         "yohash.propulsion.entities",
         "yohash.propulsion.core",
         "Unity.Entities",
+        "Unity.Collections",
         "Unity.Mathematics",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"

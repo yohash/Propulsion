@@ -4,6 +4,7 @@ using Unity.Core;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Yohash.Propulsion.Entities.Physics2D;
 
 namespace Yohash.Propulsion.Entities.Tests.Physics2D
 {
@@ -49,8 +50,11 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
       fixedStep.Update();
     }
 
-    /// <summary>A dynamic circle body. Its centre of mass is its position.</summary>
-    public Entity CreateBall(float2 position, float gravityScale = 1f, float radius = 0.5f)
+    /// <summary>
+    /// A dynamic circle body. Its centre of mass is its position, unless the circle is offset
+    /// from the body's origin by <paramref name="shapeOffset"/>.
+    /// </summary>
+    public Entity CreateBall(float2 position, float gravityScale = 1f, float radius = 0.5f, float2 shapeOffset = default)
     {
       var entity = EntityManager.CreateEntity();
       EntityManager.AddComponentData(entity, LocalTransform.FromPosition(position.x, position.y, 0f));
@@ -58,7 +62,7 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
       EntityManager.AddComponent<PhysicsDynamicTag>(entity);
       EntityManager.AddComponentData(entity, new PhysicsMaterial { Friction = 0.4f, Bounciness = 0f, Density = 1f });
       EntityManager.AddComponentData(entity, CollisionFilter.Default);
-      EntityManager.AddComponentData(entity, new PhysicsShapeCircle { Radius = radius, Center = float2.zero });
+      EntityManager.AddComponentData(entity, new PhysicsShapeCircle { Radius = radius, Center = shapeOffset });
       return entity;
     }
 
@@ -68,6 +72,8 @@ namespace Yohash.Propulsion.Entities.Tests.Physics2D
     }
 
     public float2 CenterOfMass(Entity entity) => EcsPhysics2DState.CenterOfMass(Body(entity));
+    public float2 Origin(Entity entity) => (float2)Body(entity).position;
+    public bool Awake(Entity entity) => Body(entity).awake;
     public float Angle(Entity entity) => EcsPhysics2DState.Angle(Body(entity));
 
     public void Dispose()
