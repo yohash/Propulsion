@@ -27,7 +27,7 @@ foreach (var p in UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackage
 
 var assemblies = new System.Collections.Generic.List<System.Reflection.Assembly>();
 foreach (var a in System.AppDomain.CurrentDomain.GetAssemblies())
-  if (a.GetName().Name.StartsWith("yohash."))
+  if (a.GetName().Name.StartsWith("yohash.", System.StringComparison.OrdinalIgnoreCase))
     assemblies.Add(a);
 assemblies.Sort((x, y) => string.CompareOrdinal(x.GetName().Name, y.GetName().Name));
 

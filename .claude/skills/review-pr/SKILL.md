@@ -117,6 +117,8 @@ Load the `unity:unity-cli` skill. Read memory `unity-cli-bridge-gotchas` first i
   - **not running:** ask the user to open Unity;
   - **Safe Mode:** compile errors, which already fails the compile gate. Read `Editor.log` (`%LOCALAPPDATA%\Unity\Editor\Editor.log`) for `error CS`;
   - **unreachable:** Unity is unfocused, resolving packages, or has a modal open. Ask the user to click into Unity, then poll `unity status --json` in a background loop until `"success": true`.
+- **A branch switch needs focus.** The bridge can answer while Unity still runs the previous branch. `PackageManager.Client.Resolve()` and `AssetDatabase.Refresh()` from a script eval don't pick up a changed manifest while Unity is unfocused. If the compile gate still shows the old packages, ask the user to click into Unity, and poll the gate (not just `unity status`) in a background loop.
+- **Adding a package like Entities can restart the Editor.** The PID changes, and `unity status` reports `STATUS_PIPELINE_LOAD_PENDING` until it's back. Wait for it, then run the gate again.
 - Report the Unity version, the port and any connection problems to the user.
 
 **Compile gate:**
@@ -127,6 +129,8 @@ Load the `unity:unity-cli` skill. Read memory `unity-cli-bridge-gotchas` first i
   - every type in the loaded `yohash.*` assemblies.
 - Confirm the PR's new types are listed, and types it deletes are not.
 - Run `unity command console get --level error`, and check the warnings for `Yohash.Propulsion*` ones. PRs usually promise "0 errors, no `Yohash.Propulsion*` warnings".
+- **If the PR doesn't compile,** every compile error is a blocking finding: quote it with its file and line. A compile error blocks the whole domain reload, so nothing new loads and no test runs. To keep verifying, you may apply the smallest fix for each error **locally and uncommitted**. Say so in every result that depended on it, and revert it in Clean up. Never commit or push those fixes. They go back to the author.
+- **Samples compile only when imported.** Nothing compiles `Samples~` until someone imports it, so CI and the compile gate miss sample errors. Whenever the PR adds or changes sample code, compile the samples (see "Samples" below), even if no step asks you to run them.
 
 **Commit Editor-generated files** (right after the compile gate, before you create any test assets):
 1. **Confirm the Editor is on this branch's code.** After a branch switch, Unity runs the previous branch's code until it refreshes and recompiles. The gate must pass with `isCompiling == false`, the PR's new types resolving and its deleted types gone.
@@ -158,6 +162,7 @@ Unity only writes a `.meta` for a file it imported, and resolves the lockfile on
 - **Burst:** the Burst test only proves anything with Burst compilation on (`burst.IsEnabled=True` in the editor-state script), and with `com.unity.burst` installed. Otherwise the assembly doesn't compile at all. With Burst off, an Ignored or skipped result is **not** a pass. Only toggle Burst compilation if a PR step asks you to, and restore it afterwards.
 - PlayMode tests, if any: `--mode playmode --async-tests true`, then poll `unity command test status`.
 - For a failure, quote the test's `message` and the first `stackTrace` frame in the summary.
+- **The results don't include `TestContext.WriteLine` output.** When a PR asks for printed values, such as measured frequency and damping, reproduce the test's procedure in a script eval that calls the test assembly's own helpers through reflection (they're usually `internal`), and report those values.
 
 **Samples (when the PR touches them, or asks for a sample to be run):**
 - Samples live in `Samples~`, which Unity hides. Use the root README's in-place method: confirm `Assets/Samples/` doesn't exist, then rename the package's `Samples~` to `Samples` and refresh (`AssetDatabase.Refresh()`). Unity imports it with its existing metas.
@@ -168,6 +173,8 @@ Unity only writes a `.meta` for a file it imported, and resolves the lockfile on
 **Measuring the response in Play mode:**
 - Run `unity command editor.playmode start`. It turns Run In Background on until Play mode exits, so the game keeps ticking while Unity is unfocused, and leaves PlayerSettings alone. Don't set `Application.runInBackground` yourself: in the Editor that setter also flips the PlayerSettings value.
 - Entering Play mode can reload the domain, so hook `Application.logMessageReceived` and other probes after it starts, not before.
+- Each CLI call takes about 2 s, so repeated evals while playing sample the game only coarsely. That's enough for "holds", "settles" or "offset", but not for timing, a one-step kick, or settling time.
+- **For ECS engine behaviour, a throwaway `World` is often better than Play mode.** Use `DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups`, set `FixedStepSimulationSystemGroup.RateManager = null`, and call `World.SetTime(...)` and `Update()` once per step. That gives you exact steps inside one eval, as the PR's engine tests do, for probes such as sleeping, an offset centre of mass, or a frequency fit. Dispose of it in a `finally`.
 - For frame-exact checks: `unity command editor.playmode pause`, then repeat an eval that records state and calls `EditorApplication.Step()` once per physics step. Read the body (`Rigidbody`/`Rigidbody2D` position, velocity, rotation), not its `Transform`. Note `Time.fixedDeltaTime`.
 - To check a claimed frequency or damping, record the error after a step change of target. Measure the time to reach 5% (compare with `0.75 / f` at damping 1), the overshoot, and whether it settles. A force-driven body under the wrong sub-step count, or an unconverted degrees/s, shows up here as ringing or no settling.
 - For ECS packages: inspect entities with `World.DefaultGameObjectInjectionWorld.EntityManager` queries, using `IgnoreComponentEnabledState` to see disabled enableables. Check the system order in the `FixedStepSimulationSystemGroup` against what the PR claims.
@@ -186,7 +193,9 @@ For each step, record **Pass / Partial / Fail / Not run**, what you actually did
 - unhook any probes, then `unity command editor.playmode stop`;
 - rename any `Samples` back to `Samples~`, and delete `Samples.meta`;
 - delete `Assets/_PRVerification` and its `.meta`;
-- check `unity command editor status` shows `"runInBackground": false`. If a script set it, set it back to false (both the Application and PlayerSettings values);
+- check that `unity command editor status`'s `runInBackground` matches the project's committed value (`runInBackground:` in `ProjectSettings/ProjectSettings.asset`, currently `1`). If a script changed it, set it back, both the Application and PlayerSettings values;
+- revert any local, uncommitted compile fixes, and open an empty scene (`EditorSceneManager.NewScene`) before renaming a `Samples` folder whose scene is open;
+- delete untracked settings files the PR's packages created, such as `ProjectSettings/EntitiesClientSettings.asset`. If every checkout will create one, suggest in the summary that the author commit it;
 - restore Burst compilation if you toggled it;
 - if the tree was clean at the start, `git checkout -- ProjectSettings Packages/com.yohash.*` (opening scenes and refreshes can re-serialize assets), then `AssetDatabase.Refresh()`. Don't revert the lockfile or metas you committed;
 - check `git status`. An untracked `.meta` for the PR, or a lockfile change for it, means the commit step missed it: commit it the same way. Delete any untracked meta left behind by your own test assets.
