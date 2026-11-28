@@ -1,8 +1,20 @@
 {
   "dependencies": {
-    "com.unity.burst": {
-      "version": "1.8.27",
+    "com.ecsphysics2d.core": {
+      "version": "https://github.com/yohash/ECSPhysics2D.git#v0.3.0",
       "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.entities": "1.4.4",
+        "com.unity.burst": "1.8.27",
+        "com.unity.collections": "2.6.4",
+        "com.unity.mathematics": "1.3.3"
+      },
+      "hash": "b84836e2c72259a65e6de85693f9a7bcd151e3c7"
+    },
+    "com.unity.burst": {
+      "version": "1.8.29",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.mathematics": "1.2.1",
@@ -17,11 +29,46 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.collections": {
+      "version": "2.6.6",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.8.28",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.test-framework": "1.4.6",
+        "com.unity.nuget.mono-cecil": "1.11.6",
+        "com.unity.test-framework.performance": "3.0.3"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.editorcoroutines": {
       "version": "1.1.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.entities": {
+      "version": "1.4.6",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.8.28",
+        "com.unity.collections": "2.6.6",
+        "com.unity.mathematics": "1.3.2",
+        "com.unity.modules.audio": "1.0.0",
+        "com.unity.serialization": "3.1.3",
+        "com.unity.profiling.core": "1.0.3",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.nuget.mono-cecil": "1.11.6",
+        "com.unity.modules.uielements": "1.0.0",
+        "com.unity.modules.assetbundle": "1.0.0",
+        "com.unity.modules.unityanalytics": "1.0.0",
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.scriptablebuildpipeline": "1.23.1",
+        "com.unity.test-framework.performance": "3.0.3"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.ext.nunit": {
@@ -103,6 +150,33 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.profiling.core": {
+      "version": "1.0.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.scriptablebuildpipeline": {
+      "version": "2.6.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.4.5",
+        "com.unity.modules.assetbundle": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.serialization": {
+      "version": "3.1.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.burst": "1.7.2",
+        "com.unity.collections": "2.4.2"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.settings-manager": {
       "version": "2.1.1",
       "depth": 2,
@@ -119,6 +193,16 @@
         "com.unity.modules.imgui": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
       }
+    },
+    "com.unity.test-framework.performance": {
+      "version": "3.5.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.33",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.testtools.codecoverage": {
       "version": "1.3.0",
@@ -153,6 +237,17 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
+        "com.unity.mathematics": "1.3.2"
+      }
+    },
+    "com.yohash.propulsion.entities": {
+      "version": "file:com.yohash.propulsion.entities",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.yohash.propulsion.core": "0.1.0",
+        "com.unity.entities": "1.4.4",
+        "com.unity.burst": "1.8.27",
         "com.unity.mathematics": "1.3.2"
       }
     },
